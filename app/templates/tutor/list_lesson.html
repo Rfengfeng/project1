@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% set page_title = "List lessons" %}
+{% block head %}
+  <style type="text/css">
+    .status-confirmed {
+        color: var(--bs-success);
+    }
+    .status-cancelled {
+        color: var(--bs-danger);
+    }
+  </style>
+  <script type="text/javascript">
+    var route, action ;
+
+    function onChangeStatusClick(e) {
+      route = e.target.getAttribute('data-route-url');  
+        action = e.target.getAttribute('data-action');
+        if (action === 'confirm') {
+            $('#confirmation-modal').find('.modal-body').text('Are you sure you would like to confirm this booking?');
+        }
+      $('#confirmation-modal').modal('show');
+    }
+
+    function onConfirm() {
+        var actionText = action === 'confirm' ? 'confirming' : 'cancelling'
+      fetch(route, {
+        method: 'POST',
+      }).then(resp => {
+        if (resp.ok) {
+          return resp.json()
+        } else {
+          fireToastMessage(`An error occurred while ${actionText} the booking`, 'error')
+        }
+      }).then(resp => {
+        if (resp.success) {
+          flashAndReload(resp.message, 'success', '{{ url_for("tutor_view.list_lesson", tutorid=tutor_id) }}');
+        } else {
+          fireToastMessage(
+            resp.error || resp.messsge||
+            `An error occurred while ${actionText} the booking`, 'error')
+        }
+      }).catch(e => {
+        console.error(e)
+        fireToastMessage('An error occurred while cancelling the booking', 'error')
+      })
+    }
+  </script>
+{% endblock head %}
+{% block content %}
+  <h3 class="my-4 py-4">
+    <i class="fa-solid fa-people-roof text-secondary"></i>
+    Booking information for my lessons
+  </h3>
+  <!-- Using a for loop to generate lessons information -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Lesson Title</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Booked Member</th>
+          <th>Status</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schedule in schedules %}
+          {% set booking = schedule.bookings[0] %}
+          <tr>
+            <td>{{ schedule.lesson.title }}</td>
+            <td>{{ schedule.start_datetime.strftime(datetime_format) }}</td>
+            <td>{{ schedule.end_datetime.strftime(datetime_format) }}</td>
+            <td>
+              {{ (('<a class="link link-primary"
+   href="' ~ url_for('user_view.profile', user_id=booking.user_id) ~ '">' ~ booking.user.full_name ~ '</a>') if booking else '<i>Not booked</i>') | safe }}
+            </td>
+            <td>
+              {% if booking %}<span class="status-{{ booking.status }}">{{ booking.status }}</span>{% endif %}
+            </td>
+            <td class="text-end">
+              {% if booking %}
+                {% if booking.status=='confirmed' and booking.start_datetime > now %}
+                  <button type="button"
+                          onclick="onChangeStatusClick(event)"
+                          data-route-url="{{ url_for('booking_api.cancel_booking', id=booking.id) }}"
+                          data-action="cancel"
+                          class="btn btn-danger btn-sm">Cancel</button>
+                {% elif booking.status == 'confirmed' and booking.user and booking.attended %}
+                  <span class="badge bg-success">Attended</span>
+                {% elif booking.status == 'confirmed' and booking.user %}
+                  <button type="button"
+                          onclick="window.location = '{{ url_for('schedule_view.attendance', id=schedule.id) }}'"
+                          class="btn btn-outline-primary btn-sm">Attendance</button>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% with items = schedules, route_name="tutor_view.list_lesson", route_args={'tutorid':tutor_id} %}
+      {% include 'components/pagination.html' %}
+    {% endwith %}
+  </div>
+  {% with title= "Please confirm", body = "Are you sure you would like to cancel this booking?" %}
+    {% include 'components/modals/confirmation_modal.html' %}
+  {% endwith %}
+{% endblock %}

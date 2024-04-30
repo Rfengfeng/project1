@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% set page_title = "Manage My Bookings" %}
+{% block head %}
+  <script type="text/javascript">
+    var route;
+
+    function onCancelClick(e) {
+      route = e.target.getAttribute('data-route-url');  
+      $('#confirmation-modal').modal('show');
+    }
+
+    function onConfirm() {
+      fetch(route, {
+        method: 'POST',
+      }).then(resp => {
+        if (resp.ok) {
+          return resp.json()
+        } else {
+          fireToastMessage('An error occurred while cancelling the booking', 'error')
+        }
+      }).then(resp => {
+        if (resp.success) {
+          flashAndReload('Booking cancelled successfully', 'success', '{{ url_for("booking_view.user_bookings") }}');
+        } else {
+          fireToastMessage(
+            resp.error || resp.messsge||
+            'An error occurred while cancelling the booking', 'error')
+        }
+      }).catch(e => {
+        console.error(e)
+        fireToastMessage('An error occurred while cancelling the booking', 'error')
+      })
+    }
+  </script>
+  <style type="text/css">
+  .status-confirmed {
+    color: var(--bs-success);
+  }
+  .status-cancelled {
+    color: var(--bs-danger);
+  }
+  </style>
+{% endblock head %}
+{% block content %}
+  <h1 class="py-4">Manage My Bookings</h1>
+  <p>Here you can view and manage your bookings.</p>
+  <div class="text-end py-4">
+    <a href="{{ url_for("member_view.all_lessons") }}"
+       class="btn btn-secondary text-light">Book a new lesson</a>
+    <a href="{{ url_for("member_view.list_workshop") }}"
+       class="btn btn-secondary text-light">Book a new workshop</a>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Tutor</th>
+        <th>Start Datetime</th>
+        <th>End Datetime</th>
+        <th>Status</th>
+        <th class="text-end">Price</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    {% for booking in bookings %}
+      {% set schedule = booking.schedule %}
+      <tr>
+        <td>
+          <a class="link link-primary"
+             href="{{ url_for('booking_view.details', id=booking.id) }}">
+            {{ schedule.lesson.title if schedule.lesson else schedule.workshop.title }}
+          </a>
+        </td>
+        <td>{{ booking.type }}</td>
+        <td>{{ schedule.tutor.full_name }}</td>
+        <td>{{ schedule.start_datetime.strftime(datetime_format) }}</td>
+        <td>{{ schedule.end_datetime.strftime(datetime_format) }}</td>
+        <td>
+          <span class="status-{{ booking.status }}">{{ booking.status.title() }}</span>
+        </td>
+        <td class="text-end">${{ schedule.cost }}</td>
+        <td>
+          {% if booking.status == 'confirmed' and booking.start_datetime > now %}
+            <button type="button"
+                    onclick="onCancelClick(event)"
+                    class="btn btn-primary"
+                    data-route-url="{{ url_for('booking_api.cancel_booking', id=booking.id) }}">Cancel</button>
+          {% elif booking.status == 'confirmed' %}
+            {% if booking.attended %}
+              <span class="badge bg-success">Attended</span>
+            {% else %}
+              <span class="badge bg-danger">Not Attended</span>
+            {% endif %}
+          {% elif booking.status == 'pending' and booking.start_datetime > now %}
+            <a href="{{ url_for('payment_view.booking_get', booking_id=booking.id) }}"
+               class="btn btn-primary">Pay now</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  {% with items=bookings, route_name='booking_view.user_bookings', route_args={} %}
+    {% include 'components/pagination.html' %}
+  {% endwith %}
+  {% with title= "Please confirm", body = "Are you sure you would like to cancel this booking?" %}
+    {% include 'components/modals/confirmation_modal.html' %}
+  {% endwith %}
+{% endblock %}

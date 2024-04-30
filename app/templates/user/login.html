@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% set page_title = "Login" %}
+{% block content %}
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/password_modal.js') }}"></script>
+    <form class="small-form" method="post" action="">
+        <h1 class="h3 my-4 fw-normal">Please sign in</h1>
+        <div class="form-floating mb-3">
+            <input type="text"
+                   class="form-control"
+                   id="email"
+                   name="email"
+                   placeholder="Email"
+                   required
+                   maxlength="255"
+                   minlength="2"
+                   value="{{ request.form['username'] or email or '' }}">
+            <label for="email">Email</label>
+        </div>
+        <div class="form-floating mb-3 position-relative">
+            <input type="password"
+                   class="form-control"
+                   id="password"
+                   name="password"
+                   placeholder="Password"
+                   required
+                   maxlength="20"
+                   minlength="8">
+            <span class="password-toggle" onclick="toggleVisibility('password')">
+                <i class="fa-regular fa-eye-slash"></i>
+            </span>
+            <label for="password">Password</label>
+        </div>
+        {% block button %}
+            <button class="btn btn-primary w-100 mb-3" type="submit">Sign in</button>
+            <div class="text-end">
+                <a href="{{ url_for("user_view.register") }}"
+                   class="link-secondary link-offset-2">New Member? Create an account</a>
+            </div>
+        {% endblock %}
+    </form>
+{% endblock %}

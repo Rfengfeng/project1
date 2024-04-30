@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% set page_title = "Tutor Profile" %}
+{% block head %}
+    <style type="text/css">
+    .card-profile-image {
+        max-width: 300px;
+        max-height: 300px;
+        object-fit: contain;
+        margin: auto;
+    }
+    </style>
+{% endblock head %}
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">
+            <a href="{{ url_for('member_view.lessonsbytutor', tutor_id=tutor.id) }}"
+               class="btn btn-secondary ml-3">View My Lesson Schedules</a>
+        </h2>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <img src="{{ url_for('static', filename=tutor.profile_image_url) }}"
+                         class="card-img-top card-profile-image"
+                         alt="...">
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Title:</strong> {{ tutor.title }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>First Name:</strong> {{ tutor.first_name }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Last Name:</strong> {{ tutor.last_name }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Position:</strong> {{ tutor.position }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Phone Number:</strong> {{ tutor.phone_number }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Email:</strong> {{ tutor.email }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Address:</strong> {{ tutor.address }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Date of Birth:</strong> {{ tutor.date_of_birth }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Teaching Subjects:</strong> {{ tutor.teaching_subjects }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Years of Experience:</strong> {{ tutor.years_of_experience }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Qualifications:</strong> {{ tutor.qualification }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Tutor Introduction:</strong> {{ tutor.introduction }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

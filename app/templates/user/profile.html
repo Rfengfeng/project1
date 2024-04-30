@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% set page_title = "Profile" %}
+{% block head %}
+    <style type="text/css">
+        .member-profile-image {
+            aspect-ratio: 1/1;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            width: 100%;
+        }
+    </style>
+{% endblock head %}
+{% block content %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename=member.profile_image_url) }}"
+                 class="d-block member-profile-image"
+                 alt="{{ member.full_name }}">
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="d-flex justify-content-between align-items-center mb-0">
+                        <span>User Profile</span>
+                        {% if member.id == session['user']['id'] %}
+                            <button class="btn btn-primary btn-sm"
+                                    onclick="window.location.href='{{ url_for('user_view.edit_profile', user_id=member.id) }}'">
+                                Edit Profile
+                            </button>
+                        {% else %}
+                            <span>&nbsp;</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Title:</strong> {{ member.title }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>First Name:</strong> {{ member.first_name }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Last Name:</strong> {{ member.last_name }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Position:</strong> {{ member.position or '' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Phone Number:</strong> {{ member.phone_number or '' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Email:</strong> {{ member.email }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Address:</strong> {{ member.address or '' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Date of Birth:</strong> {{ member.date_of_birth or '' }}
+                    </li>
+                    {% if member.role == 'tutor' %}
+                        <li class="list-group-item">
+                            <strong>Teaching Subjects:</strong> {{ member.teaching_subjects or '' }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Years of Experience:</strong> {{ member.years_of_experience or '' }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Qualifications:</strong> {{ member.qualification or '' }}
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            {% if member.role == 'tutor' %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tutor Introduction:</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            {{ member.introduction or ('<i>No instructions yet</i>' | safe) }}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

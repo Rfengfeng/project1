@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% set page_title = "Edit Profile" %}
+<!-- edit_profile.html -->
+{% block content %}
+    <div class="container">
+        <h1>Edit Profile</h1>
+        {% with editable = True %}
+            <div>{% include 'components/profile_image.html' %}</div>
+        {% endwith %}
+        <form method="post"
+              action="{{ url_for ("user_view.edit_profile") }}"
+              class="needs-validation"
+              novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.title.label }}
+                {{ form.title(class="form-control", required = True) }}
+                <div class="invalid-feedback">{{ form.title.errors | join(",") or 'Title is required' }}</div>
+            </div>
+            <div class="form-group">
+                {{ form.first_name.label }}
+                {{ form.first_name(class="form-control", required = True) }}
+                <div class="invalid-feedback">{{ form.first_name.errors | join(",") or 'First name is required' }}</div>
+            </div>
+            <div class="form-group">
+                {{ form.last_name.label }}
+                {{ form.last_name(class="form-control", required = True) }}
+                <div class="invalid-feedback">{{ form.last_name.errors | join(",") or 'Last name is required' }}</div>
+            </div>
+            <div class="form-group">
+                {{ form.position.label }}
+                {{ form.position(class="form-control", required = True) }}
+                <div class="invalid-feedback">{{ form.position.errors | join(",") or 'Position is required' }}</div>
+            </div>
+            <div class="form-group">
+                {{ form.phone_number.label }}
+                {{ form.phone_number(type = 'tel', class="form-control", pattern = "(0|\\+)\\d{4,20}", placeholder="Eg. +6422334455 or 022334455", required = True) }}
+                <div class="invalid-feedback">{{ form.phone_number.errors | join(",") or 'Please input a valid phone number' }}</div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                {{ form.email(class="form-control", readonly=True) }}
+                <small class="form-text text-muted">Please contact the admin to change email.</small>
+            </div>
+            <div class="form-group">
+                {{ form.address.label }}
+                {{ form.address(class="form-control", required = True) }}
+                <div class="invalid-feedback">{{ form.address.errors | join(",") or 'Address is required' }}</div>
+            </div>
+            <div class="form-group">
+                {{ form.date_of_birth.label }}
+                {{ form.date_of_birth(type='date', class="form-control", required=True) }}
+                <div class="invalid-feedback">{{ form.date_of_birth.errors | join(",") or 'Please input a valid date' }}</div>
+            </div>
+            <!-- Tutor-specific fields, displayed only if the user is a tutor -->
+            {% if is_tutor %}
+                <div class="form-group">
+                    {{ form.teaching_subjects.label }}
+                    {{ form.teaching_subjects(class="form-control") }}
+                    <div class="invalid-feedback">{{ form.teaching_subjects.errors | join(",") or 'Teaching subject is required' }}</div>
+                </div>
+                <div class="form-group">
+                    {{ form.years_of_experience.label }}
+                    {{ form.years_of_experience(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.qualification.label }}
+                    {{ form.qualification(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.introduction.label }}
+                    {{ form.introduction(class="form-control") }}
+                </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+{% endblock %}

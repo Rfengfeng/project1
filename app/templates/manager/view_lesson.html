@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% set page_title = "View Lesson" %}
+{% block content %}
+  <h1 class="py-4">{{ lesson.title }}</h1>
+  <div>
+    <small><strong>Tutored by</strong>  {{ lesson.tutor.full_name }}</small>
+  </div>
+  <div class="py-4">{{ lesson.description | safe }}</div>
+  <!-- Back button -->
+  <a href="{{ url_for("manager_view.list_lessons_get") }}"
+     class="btn btn-link">&lt;&lt; Back to lessons list</a>
+{% endblock %}

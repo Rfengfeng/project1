@@ -1,0 +1,39 @@
+<ul class="pagination" style="width: fit-content; margin: 0 auto;">
+  {% set page_key = page_key_name or 'page' %}
+  {% if items.has_prev %}
+    {% set page_args = {page_key: items.prev_num} %}
+    {% set _ = page_args.update(route_args) %}
+    <li class="page-item">
+      <a href="{{ url_for(route_name, **(page_args) ) }}" class="page-link">Previous</a>
+    </li>
+  {% endif %}
+  {% for page_num in items.iter_pages() %}
+    {% if page_num %}
+      {% if page_num == items.page %}
+        {% set page_args = {page_key: page_num} %}
+        {% set _ = page_args.update(route_args) %}
+        <li class="page-item">
+          <a href="{{ url_for(route_name, **(page_args) ) }}"
+             class="page-link active">{{ page_num }}</a>
+        </li>
+      {% else %}
+        {% set page_args = {page_key: page_num} %}
+        {% set _ = page_args.update(route_args) %}
+        <li class="page-item">
+          <a href="{{ url_for(route_name, **(page_args) ) }}" class="page-link">{{ page_num }}</a>
+        </li>
+      {% endif %}
+    {% else %}
+      <li class="page-item">
+        <a href="#" class="page-link">...</a>
+      </li>
+    {% endif %}
+  {% endfor %}
+  {% if items.has_next %}
+    {% set page_args = {page_key: items.next_num} %}
+    {% set _ = page_args.update(route_args) %}
+    <li class="page-item">
+      <a href="{{ url_for(route_name, **(page_args) ) }}" class="page-link">Next</a>
+    </li>
+  {% endif %}
+</ul>

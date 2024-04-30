@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% set page_title = "Add Member" %}
+{% block content %}
+    <h2>Add a New Member</h2>
+    <form method="post"
+          action="{{ url_for("manager_view.add_member") }}"
+          class="needs-validation"
+          novalidate>
+        <div class="mb-3">
+            <label for="first_name" class="form-label">First Name:</label>
+            <input type="text"
+                   id="first_name"
+                   name="first_name"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a first name.</div>
+        </div>
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Last Name:</label>
+            <input type="text"
+                   id="last_name"
+                   name="last_name"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a last name.</div>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email"
+                   id="email"
+                   name="email"
+                   class="form-control"
+                   required
+                   autocomplete="off">
+            <div class="invalid-feedback">Please provide a valid email address.</div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="password must be at least 8 characters long and have a mix of character types"
+                   required
+                   autocomplete="new-password">
+            <div class="invalid-feedback">Please provide a password.</div>
+        </div>
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">Confirm Password:</label>
+            <input type="password"
+                   id="confirm_password"
+                   name="confirm_password"
+                   class="form-control"
+                   required
+                   autocomplete="new-password">
+            <div class="invalid-feedback">Please confirm your password.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Member</button>
+    </form>
+{% endblock %}

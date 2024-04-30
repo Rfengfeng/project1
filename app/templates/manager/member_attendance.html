@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% set page_title = "Member Attendance" %}
+{% block head %}
+    <script type="text/javascript">
+        $(function() {
+            var anchor = location.hash;
+            if (anchor) {
+                $(`a[href='${anchor}']`).tab('show');
+            }
+        });
+    </script>
+{% endblock head %}
+{% block content %}
+    <div class="container">
+        <h1>Member Attendance</h1>
+        <div class="container">
+            <strong>You are checking: {{ member.first_name }} {{ member.last_name }}</strong>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for("manager_view.list_members") }}"
+               class="btn btn-primary">&lt; Back to Member List</a>
+        </div>
+        <!-- Tabs for Lessons and Workshops -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active"
+                   id="lessons-tab"
+                   data-bs-toggle="tab"
+                   href="#lessons"
+                   role="tab"
+                   aria-controls="lessons"
+                   aria-selected="true">Lessons</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   id="workshops-tab"
+                   data-bs-toggle="tab"
+                   href="#workshops"
+                   role="tab"
+                   aria-controls="workshops"
+                   aria-selected="false">Workshops</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <!-- Lessons Table -->
+            <div class="tab-pane fade show active"
+                 id="lessons"
+                 role="tabpanel"
+                 aria-labelledby="lessons-tab">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Start At</th>
+                            <th>End At</th>
+                            <th class="text-end">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in lesson_bookings %}
+                            <tr>
+                                <td>{{ booking.schedule.schedule_name }}</td>
+                                <td>{{ booking.start_datetime }}</td>
+                                <td>{{ booking.end_datetime }}</td>
+                                <td class="text-end">
+                                    {% if booking.attended %}
+                                        <span class="badge bg-success">Attended</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Not attended</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% with items=lesson_bookings,
+                    page_key_name='lesson_page',
+                    route_args = {'member_id': member.id, '_anchor': 'lessons'},
+                    route_name='manager_view.member_attendance' %}
+                    {% include 'components/pagination.html' %}
+                {% endwith %}
+            </div>
+            <!-- Workshops Table -->
+            <div class="tab-pane fade"
+                 id="workshops"
+                 role="tabpanel"
+                 aria-labelledby="workshops-tab">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Start At</th>
+                            <th>End At</th>
+                            <th class="text-end">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in workshop_bookings %}
+                            <tr>
+                                <td>{{ booking.schedule.schedule_name }}</td>
+                                <td>{{ booking.start_datetime.strftime(datetime_format) }}</td>
+                                <td>{{ booking.end_datetime.strftime(datetime_format) }}</td>
+                                <td class="text-end">
+                                    {% if booking.attended %}
+                                        <span class="badge bg-success">Attended</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Not attended</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% with items=workshop_bookings,
+                    route_args = {'member_id': member.id, '_anchor': 'workshops'},
+                    page_key_name='workshop_page',
+                    route_name='manager_view.member_attendance' %}
+                    {% include 'components/pagination.html' %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

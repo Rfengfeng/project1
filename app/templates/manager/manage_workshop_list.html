@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% set page_title = "List Workshop" %}
+{% block head %}
+    <script>
+        var route, action, form;
+
+    function onChangeStatusClick(e) {
+      route = e.target.getAttribute('data-route-url');  
+        action = e.target.getAttribute('data-action'); 
+        form=document.getElementById('confirmation-form');
+        form.action=route;
+        form.method='post';
+        if (action === 'confirm') {
+            $('#confirmation-modal').find('.modal-body').text('Are you sure you would like to delete this Schedule?');
+        }
+        
+      $('#confirmation-modal').modal('show');
+    }
+
+    function onConfirm() {      
+      form.submit()    
+    }
+
+    </script>
+{% endblock head %}
+{% block content %}
+    <h3 class="my-4 py-4">
+        <i class="fa-regular fa-calendar-days text-secondary"></i>
+        Workshop List
+    </h3>
+    <form action="{{ url_for("manager_view.workshop_search") }}"
+          method="get"
+          class="mb-3"
+          style="width: 100%">
+        <div class="input-group input-group-lg">
+            <input type="text"
+                   class="form-control"
+                   name="query"
+                   placeholder="Please enter workshop name">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    <!-- Using a for loop to generate workshop information -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Workshop Title</th>
+                <th>Location</th>
+                <th class="text-end">Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for workshop in workshops %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('manager_view.view_workshop_description', workshop_id=workshop.id) }}">{{ workshop.title }}</a>
+                    </td>
+                    <td>{{ workshop.location.title }}</td>
+                    <td class="text-end">${{ '{:,.2f}'.format(workshop.price) }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('manager_view.edit_workshop_list', workshop_id=workshop.id) }}"
+                           class="btn btn-primary btn-sm">Edit</a>
+                        {% if workshop.schedules|length==0 %}
+                            <button type="button"
+                                    onclick="onChangeStatusClick(event)"
+                                    data-route-url="{{ url_for('manager_view.delete_workshop', workshop_id=workshop.id) }}"
+                                    data-action="confirm"
+                                    class="btn btn-danger btn-sm">Delete</button>
+                        {% else %}
+                            <span data-bs-toggle="tooltip"
+                                  data-bs-placement="right"
+                                  title="A scheduled workshp cannot be deleted.">
+                                <button type="button" class="btn btn-outline-danger btn-sm" disabled>Delete</button>
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% with items=workshops, route_args = {}, route_name='manager_view.manage_workshop_list' %}
+        {% include 'components/pagination.html' %}
+    {% endwith %}
+    <div>
+        <br>
+        <br>
+    </div>
+    {# Button to add a new workshop schedule, aligned to the right #}
+    <div class="d-flex justify-content-end">
+        <a href="{{ url_for("manager_view.add_workshop") }}"
+           class="btn btn-secondary">Add a new workshop</a>
+    </div>
+    {% with title= "Please confirm", body = "Are you sure you would like to book this workshop?" %}
+        {% include 'components/modals/confirmation_modal.html' %}
+    {% endwith %}
+{% endblock %}

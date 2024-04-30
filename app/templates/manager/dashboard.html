@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% set page_title = "Dashboard" %}
+{% block head %}
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/timetable.css') }}">
+{% endblock %}
+{% block content %}
+  {% with table_entries = time_table %}
+    <h1 class="py-4">{{ greeting }} {{ user.first_name }}!</h1>
+    <p>
+      Welcome to the dashboard.
+      <br />
+      {% if expiring_subscriptions %}
+        <i class="fa fa-bell"></i> There are {{ expiring_subscriptions }} <a href="{{ url_for("subscription_view.expired_subscriptions_get") }}">member subscriptions</a> are about to expire.
+      {% endif %}
+    </p>
+    <h3 class="py-4">
+      <i class="fa-solid fa-calendar-days text-secondary"></i> Timetable
+    </h3>
+    <p class="pb-4">
+      Here is the timetable for the next weeks. You can view view and modify your bookings by clicking on the events.
+    </p>
+    {% include 'components/timetable.html' %}
+    <h3 class="my-4 py-4">
+      <i class="fa-solid fa-cog text-secondary"></i>
+      Site Administration
+    </h3>
+    <div class="grid-4 py-4">
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-users text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Members</h5>
+          <p class="card-text">View and manage all members</p>
+          <a href="{{ url_for("manager_view.list_members") }}"
+             class="btn btn-primary">View Members</a>
+        </div>
+      </div>
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-graduation-cap text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Tutors</h5>
+          <p class="card-text">View and manage all tutors</p>
+          <a href="{{ url_for("manager_view.list_tutors") }}"
+             class="btn btn-primary">View Tutors</a>
+        </div>
+      </div>
+      <div class="card border-secondary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-envelope-open-text text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Subscriptions</h5>
+          <p class="card-text">Manage subscriptions</p>
+          <a href="{{ url_for("manager_view.list_subscriptions") }}"
+             class="btn btn-primary">Manage Subscriptions</a>
+        </div>
+      </div>
+      <div>
+        <div class="card border-primary">
+          <div class="py-4 text-center">
+            <i class="fa-solid fa-book text-secondary fa-4x"></i>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Lessons</h5>
+            <p class="card-text">View and manage lessons</p>
+            <a href="{{ url_for("manager_view.list_lessons_get") }}"
+               class="btn btn-primary">View Lessons</a>
+          </div>
+        </div>
+      </div>
+      <div class="card border-secondary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-people-roof text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Workshops</h5>
+          <p class="card-text">Manage workshops &amp; schedules</p>
+          <div class="row">
+            <div class="col-sm-6">
+              <a href="{{ url_for("manager_view.manage_workshop_list") }}"
+                 class="btn btn-primary">Workshops</a>
+            </div>
+            <div class="col-sm-6 text-end">
+              <a href="{{ url_for("manager_view.list_workshop") }}"
+                 class="btn btn-primary">Schedules</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-newspaper text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">News</h5>
+          <p class="card-text">Manage news articles</p>
+          <a href="{{ url_for("manager_view.list_news") }}"
+             class="btn btn-primary">Manage News</a>
+        </div>
+      </div>
+      <div class="card border-secondary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-map text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Locations</h5>
+          <p class="card-text">Manage locations</p>
+          <a href="{{ url_for("manager_view.list_locations") }}"
+             class="btn btn-primary">Manage Locations</a>
+        </div>
+      </div>
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-chart-line text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Reports</h5>
+          <p class="card-text">View reports</p>
+          <a href="{{ url_for("report_view.home") }}" class="btn btn-primary">View Reports</a>
+        </div>
+      </div>
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-dollar-sign text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Payments</h5>
+          <p class="card-text">View payments</p>
+          <a href="{{ url_for("track_payments_view.track_payments") }}"
+             class="btn btn-primary">View Payments</a>
+        </div>
+      </div>
+    </div>
+    <h3 class="my-4 py-4">
+      <i class="fa-solid fa-gear text-secondary"></i>
+      Manage my account
+    </h3>
+    <div class="grid-4 py-4">
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-user text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">My Profile</h5>
+          <p class="card-text">View and edit your profile</p>
+          <a href="{{ url_for("user_view.profile") }}" class="btn btn-primary">View Profile</a>
+        </div>
+      </div>
+      {% include 'components/cards/security_card.html' %}
+    </div>
+  {% endwith %}
+{% endblock %}

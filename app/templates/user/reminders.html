@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% set page_title = "Reminders" %}
+{% block head %}
+  <script type="text/javascript">
+  var url, button;
+
+  function showConfirmationModal(e) {
+    button = e.target;
+    url = button.getAttribute('data-url');
+    const modal = $('#confirmation-modal')
+    modal.modal('show')
+  }
+
+  function onConfirm() {
+    fetch(url, {
+      method: 'POST',
+    }).then(response => {
+      if (response.ok) {
+        return response.json()
+      }
+    }).then(resp => {
+      if (resp?.success) {
+        const td = button.parentElement;
+        const readBadge = $(`<span class="badge text-bg-success" data-bs-toggle="tooltip" data-bs-title="Read at ${ resp.read_at }">
+                <i class="fa-solid fa-check"></i>
+                Read
+              </span>`);
+        $(td).empty().append(readBadge);
+        readBadge.tooltip();
+        $('#confirmation-modal').modal('hide') 
+        pollReminders()
+      }
+    })
+  }
+  function showContent(e) {
+    e.preventDefault();
+    const reminderContent = e.target.nextElementSibling;
+    const url = e.target.href;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        let html = `<p class="pt-2">${data.reminder.content}</p>`
+        if (data.reminder.action_text && data.reminder.action_url) {
+          html += `<p><a class="btn btn-primary" target="_blank" href="${data.reminder.action_url}">${data.reminder.action_text}</a></p>`
+        }
+        reminderContent.innerHTML = html; 
+      })
+  }
+  </script>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">Reminders</h1>
+  <table class="table">
+    <thead>
+      <colgroup>
+        <col style="width: 20%">
+        <col>
+        <col style="width: 10%">
+        <col style="width: 15%">
+      </colgroup>
+      <tr>
+        <th>Date Time</th>
+        <th>Subject</th>
+        <th>Sender</th>
+        <th class="text-end">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reminder in reminders %}
+        <tr>
+          <td>{{ reminder.reminded_at.strftime(datetime_format) }}</td>
+          <td>
+            <a href="{{ url_for('reminder_api.get_reminder', id=reminder.id) }}"
+               onclick="showContent(event)">{{ reminder.subject }}</a>
+            <span class="reminder-content"></span>
+          </td>
+          <td>{{ reminder.sender_name }}</td>
+          <td class="text-end">
+            {% if reminder.read_at %}
+              <span class="badge text-bg-success"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Read at {{ reminder.read_at.strftime(datetime_format) }}">
+                <i class="fa-solid fa-check"></i>
+                Read
+              </span>
+            {% else %}
+              <button type="button"
+                      class="btn btn-sm btn-primary"
+                      onclick="showConfirmationModal(event)"
+                      data-url="{{ url_for('reminder_api.mark_as_read', id=reminder.id) }}">Mark as Read</button>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% with items=reminders, route_args = {}, route_name='user_view.list_reminders' %}
+    {% include 'components/pagination.html' %}
+  {% endwith %}
+  {% with title="Please confirm", body='Are you sure you want to mark this reminder as read?' %}
+    {% include 'components/modals/confirmation_modal.html' %}
+  {% endwith %}
+{% endblock %}

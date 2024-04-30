@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% set page_title = "Dashboard" %}
+{% block head %}
+  <style type="text/css">
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(calc(33% - 3rem), 1fr));
+      gap: 3rem;
+    }
+    .grid-merino {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(calc(33% - 3rem), 1fr));
+      gap: 3rem;
+    }
+
+    .logo-on-title {
+      width: 3rem;
+    }
+    .card-img-top {
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      background-color: rgba(var(--bs-secondary-rgb), 0.3);
+      mix-blend-mode: multiply;
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4 d-flex justify-content-between">
+    {{ greeting }} {{ user.first_name }}!
+    {% include 'components/reminder_link.html' %}
+  </h1>
+  {% include 'components/top_news.html' %}
+  <p class="fs-4">Welcome to your dashboard. Here you can manage your profile, bookings and subscription.</p>
+  {% if user.role == 'member' and bookings %}
+    <h3 class="py-4">
+      <i class="fa-solid fa-bookmark text-secondary"></i>
+      Up coming events ({{ booking_count }})
+    </h3>
+    <div class="grid py-4">
+      {% for booking in bookings %}
+        {% set schedule_item = booking.schedule.lesson or booking.schedule.workshop %}
+        {% if schedule_item %}
+          <div class="booking rounded border p-3 border-secondary">
+            <div>
+              <h5 class="text-secondary">
+                {% if booking.schedule.lesson_id %}
+                  <i class="fa-solid fa-person-chalkboard"></i>
+                {% elif booking.schedule.workshop_id %}
+                  <i class="fa-solid fa-people-roof text-secondary"></i>
+                {% endif %}
+                &nbsp;
+                <a class="link link-secondary"
+                   href="{{ url_for('booking_view.details', id=booking.id) }}">{{ schedule_item.title }}</a>
+              </h5>
+              <div>
+                {{ booking.start_datetime.strftime(datetime_format) }} -
+                {% if booking.end_datetime.date() == booking.start_datetime.date() %}
+                  {{ booking.end_datetime.strftime(time_format) }}
+                {% else %}
+                  {{ booking.end_datetime.strftime(datetime_format) }}
+                {% endif %}
+              </div>
+              <div>By {{ booking.schedule.tutor.full_name }}</div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+  <h3 class="my-4 d-flex align-items-center">
+    <img class="d-block logo-on-title"
+         src="{{ url_for('static', filename='img/logo.png') }}"
+         alt="kiwi merino logo" />
+    Upgrade my skills
+  </h3>
+  <div class="grid-merino my-4 py-4">
+    <div class="card border-secondary">
+      <img class="card-img-top"
+           src="{{ url_for('static', filename='img/tutor.jpg') }}"
+           alt="Tutors">
+      <div class="card-body">
+        <h5 class="card-title">Tutors</h5>
+        <p class="card-text">Get one on one tutoring from our tutors</p>
+        <a href="{{ url_for("member_view.list_tutors") }}"
+           class="btn btn-secondary text-light">View Tutors</a>
+      </div>
+    </div>
+    <div class="card border-secondary">
+      <img class="card-img-top"
+           src="{{ url_for('static', filename='img/lessonnew.jpg') }}"
+           alt="Lessons">
+      <div class="card-body">
+        <h5 class="card-title">Lessons</h5>
+        <p class="card-text">View our lesson schedules and book lessons</p>
+        <a href="{{ url_for("member_view.all_lessons") }}"
+           class="btn btn-secondary text-light">View Lessons</a>
+      </div>
+    </div>
+    <div class="card border-secondary">
+      <img class="card-img-top"
+           src="{{ url_for('static', filename='img/workshop.jpg') }}"
+           alt="Workshops">
+      <div class="card-body">
+        <h5 class="card-title">Workshops</h5>
+        <p class="card-text">Attend our workshops and learn new skills</p>
+        <a href="{{ url_for("member_view.list_workshop") }}"
+           class="btn btn-secondary text-light">View Workshops</a>
+      </div>
+    </div>
+  </div>
+  <h3 class="my-4 py-4">
+    <i class="fa-solid fa-gear text-secondary"></i>
+    Manage my account
+  </h3>
+  <div class="grid-4 py-4">
+    <div class="card border-primary">
+      <div class="py-4 text-center">
+        <i class="fa-solid fa-user text-secondary fa-4x"></i>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">My Profile</h5>
+        <p class="card-text">View and edit your profile</p>
+        <a href="{{ url_for("user_view.profile") }}" class="btn btn-primary">View Profile</a>
+      </div>
+    </div>
+    {% include 'components/cards/security_card.html' %}
+    <div>
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-calendar text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">My Bookings</h5>
+          <p class="card-text">View and manage your bookings</p>
+          <a href="{{ url_for("booking_view.user_bookings") }}"
+             class="btn btn-primary">View Bookings</a>
+        </div>
+      </div>
+    </div>
+    <div class="card border-secondary">
+      <div class="py-4 text-center">
+        <i class="fa-solid fa-credit-card text-secondary fa-4x"></i>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Subscription</h5>
+        <p class="card-text">Manage your subscription</p>
+        <a href="{{ url_for('subscription_view.subscription_details', user_id=user.id) }}"
+           class="btn btn-primary">Manage Subscription</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

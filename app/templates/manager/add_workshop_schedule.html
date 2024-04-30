@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% set page_title = "Add A Workshop Schedule" %}
+{% block head %}
+    <script type="text/javascript">
+        function onWorkshopChange(workshop_id) {
+            const url = $(`option[value="${workshop_id}"]`).data('location-url');
+            let link = $('#location-link');
+            if (link.length) {
+                link.attr('href', url);
+                return;
+            }
+            link = $(`<a id="location-link" href="${url}" target="_blank" class="link link-primary">View location availabilities</a>`);
+            link.insertAfter('#workshop_id')
+        }
+        const current_workshop_id='{{ workshop_id or '' }}';
+        $(function() {
+            if (current_workshop_id) {
+                $('#workshop_id').val(current_workshop_id);
+                onWorkshopChange(current_workshop_id);
+            }
+        });
+    </script>
+{% endblock head %}
+{% block content %}
+    <h2 class="my-4 py-4">Add A Workshop Schedule</h2>
+    <form method="post"
+          action="{{ url_for("manager_view.add_workshop_schedule") }}"
+          class="needs-validation"
+          novalidate>
+        <div class="mb-3">
+            <label for="workshop_id" class="form-label">Workshop Name:</label>
+            <select id="workshop_id"
+                    name="workshop_id"
+                    class="form-select"
+                    required
+                    onchange="onWorkshopChange(this.value)">
+                <option value="" disabled selected>Select Workshop</option>
+                {% for workshop in workshops %}
+                    <option data-location-url="{{ url_for('location_view.view_location', id=workshop.location_id) }}"
+                            value="{{ workshop.id }}">{{ workshop.title }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a Workshop.</div>
+        </div>
+        <div class="mb-3">
+            <label for="start_datetime" class="form-label">Start Datetime:</label>
+            <input type="datetime-local"
+                   id="start_datetime"
+                   name="start_datetime"
+                   value=""
+                   class="form-control"
+                   value="{{ start_datetime.strftime("%Y-%m-%dT%H:%M") if start_datetime else '' }}"
+                   required>
+            <div class="invalid-feedback">Please provide a start datetime.</div>
+        </div>
+        <div class="mb-3">
+            <label for="end_datetime" class="form-label">End Datetime:</label>
+            <input type="datetime-local"
+                   id="end_datetime"
+                   name="end_datetime"
+                   value=""
+                   class="form-control"
+                   value="{{ end_datetime.strftime("%Y-%m-%dT%H:%M") if end_datetime else '' }}"
+                   required>
+            <div class="invalid-feedback">Please provide a valid end datetime.</div>
+        </div>
+        <div class="mb-3">
+            <label for="tutor_id" class="form-label">Tutor:</label>
+            <select id="tutor_id" name="tutor_id" class="form-select" required>
+                <option value="" disabled selected>Select Tutor</option>
+                {% for tutor in tutors %}
+                    <option value="{{ tutor.id }}" {{ 'selected' if tutor.id == tutor_id else '' }}>{{ tutor.full_name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a Tutor.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Workshop Schedule</button>
+    </form>
+{% endblock %}

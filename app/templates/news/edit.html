@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% set page_title = "Edit News" %}
+{% block head %}
+  <style type="text/css">
+    .ck-editor__editable[role="textbox"] {
+      /* Editing area */
+      min-height: 200px;
+    }
+  </style>
+  <script type="text/javascript">
+    $(function () {
+      ClassicEditor
+        .create(document.querySelector('#content'), {
+          heading: {
+              options: [
+                  { model: 'paragraph', title: 'Paragraph', class: '' },
+                  { model: 'heading1', view: 'h1', title: 'Heading 1', class: '' },
+                  { model: 'heading2', view: 'h2', title: 'Heading 2', class: '' },
+                  { model: 'heading3', view: 'h3', title: 'Heading 3', class: '' },
+                  { model: 'heading4', view: 'h4', title: 'Heading 4', class: '' },
+                  { model: 'heading5', view: 'h5', title: 'Heading 5', class: '' },
+                  { model: 'heading6', view: 'h6', title: 'Heading 6', class: '' },
+              ],
+          },
+          toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ],
+        }).catch(error => {
+            console.error( error );
+        });
+    });
+  </script>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">{{ page_title }}</h1>
+  <form action="{{ url_for('news_view.save_news', id=(news.id if news else 0) ) }}"
+        novalidate
+        class="needs-validation"
+        method="post">
+    <div class="form-group">
+      <label class="form-label" for="title">Title</label>
+      <input class="form-control"
+             type="text"
+             name="title"
+             id="title"
+             value="{{ news.title if news else '' }}"
+             pattern="[a-zA-Z]{2,}.*"
+             required>
+      <div class="invalid-feedback">Please provide a valid title.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="author">Author</label>
+      <input class="form-control"
+             type="text"
+             name="author"
+             id="author"
+             value="{{ news.author if news else session['user']['full_name'] }}"
+             pattern="\w{2,}.*"
+             required>
+      <div class="invalid-feedback">Please provide a valid author name.</div>
+    </div>
+    <div>
+      <div class="form-group">
+        <label class="form-label" for="content">Content</label>
+        <textarea class="form-control" name="content" id="content" rows="10" required>{{ news.content if news else '' }}</textarea>
+      </div>
+    </div>
+    <div class="pt-4 d-flex justify-content-between">
+      <a href="{{ url_for("manager_view.list_news") }}"
+         class="link link-secondary">&lt;&lt; Back to news list</a>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.3.0/classic/ckeditor.js"></script>
+{% endblock %}

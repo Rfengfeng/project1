@@ -1,0 +1,17 @@
+{
+    "[html]": {
+        "editor.defaultFormatter": "monosans.djlint"
+    },
+    "[jinja-html]": {
+        "editor.defaultFormatter": "monosans.djlint"
+    },
+    "editor.formatOnSave": true,
+    "editor.accessibilitySupport": "off",
+    "files.associations": {
+        "*.html": "jinja-html",
+    },
+    "python.analysis.autoImportCompletions": true,
+    "autopep8.args": [
+        "--indent-size=2"
+    ],
+}

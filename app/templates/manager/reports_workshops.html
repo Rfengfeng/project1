@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% set page_title = "Reports" %}
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+  <script type="text/javascript">
+    $(function () {
+      const data = {{workshops | tojson}};
+      const ctx = document.getElementById('workshop-report').getContext('2d');
+      showWorkshopChart(ctx, data)
+    });
+  </script>
+  <style type="text/css">
+    canvas {
+      width: 100%;
+      height: minmax(200px, 40vh);
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">Reports</h1>
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a href="{{ url_for("report_view.home") }}"
+         class="nav-link"
+         id="revenue-tab"
+         type="button"
+         role="tab">Revenue reports</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="workshops-tab"
+              type="button"
+              role="tab"
+              aria-selected="true">Workshops</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a href="{{ url_for("report_view.attendance") }}"
+         class="nav-link"
+         id="attendance-tab"
+         type="button"
+         role="tab">Attendance</a>
+    </li>
+  </ul>
+  <div id="revenue-tab-pane" class="tab-pane fade show active">
+    <h2 class="py-4">Workshop popularity</h2>
+    <form action="" method="get" class="small-form mb-4">
+      <div class="input-group">
+        <label class="input-group-text" for="date_start">Start</label>
+        <input type="date"
+               class="form-control"
+               id="date_start"
+               value="{{ date_start.strftime("%Y-%m-%d") if date_start else '' }}"
+               name="date_start">
+        <label class="input-group-text" for="date_end">End</label>
+        <input type="date"
+               class="form-control"
+               id="date_end"
+               value="{{ date_end.strftime("%Y-%m-%d") if date_end else '' }}"
+               name="date_end">
+        <button class="btn btn-primary" id="filter">View</button>
+      </div>
+    </form>
+    <div>
+      <canvas id="workshop-report"></canvas>
+    </div>
+    <table class="table mt-4">
+      <thead>
+        <tr>
+          <th>Workshop</th>
+          <th class="text-end">Total bookings</th>
+          <th class="text-end">Number of attendees</th>
+          <th class="text-end">Attendance rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for workshop in workshops %}
+          <tr>
+            <td>
+              <a href="{{ url_for('manager_view.view_workshop_description', workshop_id=workshop.workshop_id) }}"
+                 target="_blank">{{ workshop.title }}</a>
+            </td>
+            <td class="text-end">{{ workshop.booking_count }}</td>
+            <td class="text-end">{{ workshop.attended_count }}</td>
+            <td class="text-end">{{ '{:.2f}'.format(workshop.attendance_rate * 100) }}%</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

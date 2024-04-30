@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% set page_title = "Create a Lesson Schedule" %}
+{% block content %}
+    <h2>Create a schedule for an existing lesson</h2>
+    <hr>
+    <!-- Form for creating schedules for an existing lesson -->
+    <form method="post"
+          action="{{ url_for("tutor_view.create_schedule_existing_lesson") }}"
+          class="needs-validation"
+          novalidate>
+        <!-- Include form fields for selecting an existing lesson -->
+        <div class="mb-3">
+            <label for="existing_lesson" class="form-label">Select Existing Lesson:</label>
+            <select id="existing_lesson"
+                    name="existing_lesson"
+                    class="form-control"
+                    required>
+                {% for lesson in lessons %}<option value="{{ lesson.id }}">{{ lesson.title }}</option>{% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select an existing lesson.</div>
+        </div>
+        <!-- Include form fields for start time and end time -->
+        <div class="mb-3">
+            <label for="start_time" class="form-label">Start Time:</label>
+            <input type="datetime-local"
+                   id="start_time"
+                   name="start_time"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a valid start time.</div>
+        </div>
+        <div class="mb-3">
+            <label for="end_time" class="form-label">End Time:</label>
+            <input type="datetime-local"
+                   id="end_time"
+                   name="end_time"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a valid end time.</div>
+        </div>
+        <!-- Include other form fields if needed -->
+        <button type="submit" class="btn btn-primary">Create Lesson Schedule</button>
+    </form>
+{% endblock %}

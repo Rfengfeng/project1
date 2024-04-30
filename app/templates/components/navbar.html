@@ -1,0 +1,81 @@
+<nav class="navbar navbar-expand-lg navbar-light"
+     style="border-bottom: 5px solid #ff4136">
+  <div class="container px-5">
+    <!-- Add img -->
+    <a class="navbar-brand" href="{{ url_for("homepage") }}">
+      <img src="{{ url_for('static', filename='img/banner.png') }}"
+           alt="Logo"
+           class="navbar-brand"
+           style="width: 200px;
+                  height: 50px">
+    </a>
+    {% if 'user' in session %}
+      <button class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNavAltMarkup"
+              aria-controls="navbarNavAltMarkup"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link link-primary {{ 'active' if 'news_view.list_news' == request.url_rule.endpoint else '' }}"
+             href="{{ url_for("news_view.list_news") }}"><i class="fa-regular fa-newspaper"></i> News</a>
+        </div>
+      </div>
+    {% endif %}
+    <button class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ms-auto">
+        {% if 'user' in session %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="navbarDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">Welcome, {{ session['user']['first_name'] }}</a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li>
+                <a class="dropdown-item" href="{{ url_for("user_view.dashboard") }}">My Dashboard</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for("user_view.profile") }}">My Profile</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for("user_view.logout") }}">Logout</a>
+              </li>
+            </ul>
+          </li>
+          <li id="nav-item-reminders" class="nav-item d-none">
+            <a href="{{ url_for("user_view.list_reminders") }}"
+               data-bs-toggle="tooltip"
+               data-bs-placement="bottom"
+               title="Reminders"
+               class="btn btn-outline-primary position-relative">
+              <i class="fa-solid fa-bell"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <span id="nav-num-reminders">1</span>
+                <span class="visually-hidden">unread reminders</span>
+              </span>
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for("user_view.login") }}">Sign Up/Log In</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

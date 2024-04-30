@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% set page_title = "List Lessons" %}
+{% set datetime = namespace(now=now) %}
+{% block head %}
+    <script>
+        function onChangeStatusClick(e) {
+            var route = e.currentTarget.getAttribute('data-route-url');  
+            var action = e.currentTarget.getAttribute('data-action'); 
+            var text = e.currentTarget.getAttribute('data-text');  // Get confirmation text
+            var form = document.getElementById('confirmation-form');
+            var modalBody = $('#confirmation-modal').find('.modal-body');  // Get modal body
+
+            form.action = route;
+            form.method = 'post';
+
+            if (action === 'confirm' && text) {
+                modalBody.text(text);  // Set modal body text
+                // Update the Confirm button onclick to submit the form
+                $('#btn-confirm').attr('onclick', 'document.getElementById("confirmation-form").submit();');
+            }
+            
+            $('#confirmation-modal').modal('show');
+        }
+    </script>
+{% endblock head %}
+{% block content %}
+    <section id="addLesson" class="mb-4">
+        <h3>
+            <i class="fas fa-chalkboard-teacher"></i> Add a New Lesson
+        </h3>
+        <p>Press the button to add a new lesson.</p>
+        <!-- Add Lesson button -->
+        <a href="{{ url_for("manager_view.add_lesson") }}"
+           class="btn btn-primary">Add a New Lesson</a>
+    </section>
+    <!-- Search bar section -->
+    <h3>
+        <i class="fas fa-search"></i> Search for a Lesson
+    </h3>
+    <section id="searchBar" class="mb-4" style="margin-top: 35px">
+        <form action="{{ url_for("manager_view.list_lessons_get") }}"
+              method="post"
+              class="form-inline">
+            <div class="input-group mb-3">
+                <input type="text"
+                       name="search"
+                       placeholder="lesson title or lesson number"
+                       class="form-control"
+                       style="max-width: 250px">
+                <select class="form-control" name="tutor" style="max-width: 250px;">
+                    <option value="" selected disabled>Select tutor</option>
+                    {% for tutor in tutors %}<option value="{{ tutor.id }}">{{ tutor.full_name }}</option>{% endfor %}
+                </select>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search & Filter</button>
+                </div>
+            </div>
+        </form>
+    </section>
+    <h2>
+        <i class="fas fa-book"></i> Lessons
+    </h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Lesson Title</th>
+                <th>Lesson Number</th>
+                <th>Cost</th>
+                <th>Tutor</th>
+                <th>Lesson schedules</th>
+                <th>Edit/delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lesson in lessons %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('manager_view.view_lesson', id=lesson.id) }}"
+                           target="_blank">{{ lesson.title }}</a>
+                    </td>
+                    <td>{{ lesson.lesson_number }}</td>
+                    <td>{{ lesson.cost }}</td>
+                    <td>{{ lesson.tutor.full_name }}</td>
+                    <td>
+                        <a href="{{ url_for("manager_view.list_schedules", lesson_id=lesson.id) }}">View Schedules</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for("manager_view.edit_lesson_get", lesson_id=lesson.id) }}"
+                           class="btn btn-primary">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        {% if lesson.schedules %}
+                            <span data-bs-toggle="tooltip" title="A scheduled lesson cannot be deleted">
+                                <button class="btn btn-outline-primary" type="button" disabled>
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </span>
+                        {% else %}
+                            <a href="{{ url_for('manager_view.delete_lesson', lesson_id=lesson.id) }}"
+                               class="btn btn-danger"
+                               onclick="onChangeStatusClick(event)"
+                               data-action="confirm"
+                               data-route-url="{{ url_for('manager_view.delete_lesson', lesson_id=lesson.id) }}"
+                               data-text="Are you sure you would like to delete this Lesson?"
+                               data-bs-toggle="modal"
+                               data-bs-target="#confirmation-modal">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% with title="Delete lesson" %}
+        {% include "components/modals/confirmation_modal.html" %}
+    {% endwith %}
+    <!-- Pagination -->
+    {% with route_args={}, route_name="manager_view.list_lessons_get", items=lessons %}
+        {% include "components/pagination.html" %}
+    {% endwith %}
+{% endblock %}

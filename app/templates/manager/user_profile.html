@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block head %}
+  <style type="text/css">
+  .profile-picture {
+    object-fit: contain;
+  }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">{{ user.full_name }}</h1>
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Profile</h5>
+          <a href="{{ url_for('manager_view.manage_profile', id=user.id) }}"
+             class="btn btn-primary ms-auto btn-sm"><i class="fa-solid fa-pencil"></i> Edit</a>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            {% if user.profile_image_url %}
+              <img src="{{ url_for('static', filename=user.profile_image_url) }}"
+                   class="h-100 w-100 rounded-start profile-picture"
+                   alt="{{ user.full_name }} profile picture" />
+            {% else %}
+              <div class="card-img-top bg-secondary text-white d-flex justify-content-center align-items-center">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <div class="card-text">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <strong>Title:</strong> {{ user.title or '' }}
+                  </li>
+                  <li class="list-group-item">
+                    <strong>First Name:</strong> {{ user.first_name }}
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Last Name:</strong> {{ user.last_name }}
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Email:</strong> {{ user.email }}
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Phone:</strong> {{ user.phone or '' }}
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Address:</strong> {{ user.address or '' }}
+                  </li>
+                  <li class="list-group-item">
+                    <strong>Date of Birth:</strong>
+                    {{ user.date_of_birth.strftime(date_format) if user.date_of_birth  else '' }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {# User subscriptions#}
+    {% if user.role == 'member' %}
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="d-flex justify-content-between align-items-center mb-0">
+              <span>Membership</span>
+              <small class="fw-normal">
+                {% if not user.membership_expiry %}
+                  <span class="badge bg-danger">No membership</span>
+                {% elif (user.membership_expiry - now).days < 0 %}
+                  <span class="badge bg-danger">Expired on {{ user.membership_expiry.strftime(date_format) }}</span>
+                {% elif (user.membership_expiry - now).days < 7 %}
+                  <span class="badge bg-success">Active</span>
+                  <span class="badge bg-warning">Expiring on {{ user.membership_expiry.strftime(date_format) }}</span>
+                {% else %}
+                  <span class="badge bg-success">Active</span>
+                  <span class="badge bg-success">Expires on {{ user.membership_expiry.strftime(date_format) }}</span>
+                {% endif %}
+              </small>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="card-text pt-4">
+              {% if not user.user_subscriptions %}
+                <div class="ps-3">No subscriptions</div>
+              {% else %}
+                <div class="ps-3 fw-medium">Subscriptions:</div>
+              {% endif %}
+              <ul class="list-group list-group-flush">
+                {% for sub in user.user_subscriptions | sort(attribute = 'start_datetime', reverse=True) %}
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ sub.start_datetime.strftime(date_format) }} - {{ sub.end_datetime.strftime(date_format) }}</span>
+                    <span>{{ sub.subscription.title }}</span>
+                    {% if sub.end_datetime < now %}
+                      <span class="badge bg-danger">Expired</span>
+                    {% elif (sub.end_datetime - now).days < 7 and sub.start_datetime < now %}
+                      <span class="badge bg-warning">Expiring</span>
+                    {% elif sub.start_datetime < now %}
+                      <span class="badge bg-success">Active</span>
+                    {% else %}
+                      <span class="badge bg-info">Future</span>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title d-flex align-items-center mb-0 justify-content-between">
+              <span>Lesson attendance ({{ lessons_attended }} / {{ lessons_booked }})</span>
+              <a href="{{ url_for('manager_view.member_attendance', member_id=user.id, _anchor="lesson") }}"
+                 class="btn btn-primary btn-sm">View all</a>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="card-text">Most recent bookings:</div>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for booking in lesson_bookings %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-bold">{{ booking.schedule.schedule_name }}</div>
+                  <div>{{ booking.start_datetime.strftime(datetime_format) }}</div>
+                </div>
+                <div>
+                  {% if booking.status == 'confirmed' %}
+                    {% if booking.attended %}
+                      <span class="badge bg-success">Attended</span>
+                    {% else %}
+                      <span class="badge bg-danger">Not attended</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-warning">Booking {{ booking.status }}</span>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title d-flex align-items-center justify-content-between mb-0">
+              <span>Workshop attendance ({{ workshops_attended }} / {{ workshops_booked }})</span>
+              <a href="{{ url_for('manager_view.member_attendance', member_id=user.id, _anchor="workshops") }}"
+                 class="btn btn-primary btn-sm">View all</a>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="card-text">Most recent bookings:</div>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for booking in workshop_bookings %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-bold">{{ booking.schedule.schedule_name }}</div>
+                  <div>{{ booking.start_datetime.strftime(datetime_format) }}</div>
+                </div>
+                <div>
+                  {% if booking.status == 'confirmed' %}
+                    {% if booking.attended %}
+                      <span class="badge bg-success">Attended</span>
+                    {% else %}
+                      <span class="badge bg-danger">Not attended</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="badge bg-warning">Booking {{ booking.status }}</span>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

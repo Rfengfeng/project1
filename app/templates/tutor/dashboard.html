@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% set page_title = "Dashboard" %}
+{% block head %}
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/timetable.css') }}">
+{% endblock %}
+{% block content %}
+  {% with table_entries = time_table %}
+    <h1 class="py-4 d-flex justify-content-between">
+      {{ greeting }} {{ user.first_name }}!
+      {% include "components/reminder_link.html" %}
+    </h1>
+    {% include 'components/top_news.html' %}
+    <p class="fs-4">Welcome to your dashboard. Here you can manage your profile, lessons and workshops.</p>
+    <h3 class="py-4">
+      <i class="fa-solid fa-calendar-days text-secondary"></i> My Timetable
+    </h3>
+    <p class="pb-4">
+      Here is your timetable for the next weeks. You can view view and modify your bookings by clicking on the lesson.
+    </p>
+    {% include 'components/timetable.html' %}
+    <h3 class="my-4 py-4">
+      <i class="fa-solid fa-gear text-secondary"></i>
+      Manage my account
+    </h3>
+    <div class="grid-4 py-4">
+      <div class="card border-primary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-user text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">My Profile</h5>
+          <p class="card-text">View and edit your profile</p>
+          <a href="{{ url_for("user_view.profile") }}" class="btn btn-primary">View Profile</a>
+        </div>
+      </div>
+      {% include 'components/cards/security_card.html' %}
+      <div>
+        <div class="card border-primary">
+          <div class="py-4 text-center">
+            <i class="fa-solid fa-book text-secondary fa-4x"></i>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">My Lessons</h5>
+            <p class="card-text">View and manage your lessonns</p>
+            <div class="d-flex justify-content-between">
+              <a href="{{ url_for('tutor_view.list_lesson',tutorid=user.id) }}"
+                 class="btn btn-primary">Bookings</a>
+              <a href="{{ url_for("tutor_view.manage_lesson_schedule") }}"
+                 class="btn btn-primary">Lessons</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card border-secondary">
+        <div class="py-4 text-center">
+          <i class="fa-solid fa-people-roof text-secondary fa-4x"></i>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">My Workshops</h5>
+          <p class="card-text">Manage your workshops</p>
+          <a href="{{ url_for("tutor_view.workshop_schedules") }}"
+             class="btn btn-primary">Manage Workshops</a>
+        </div>
+      </div>
+    </div>
+  {% endwith %}
+{% endblock %}

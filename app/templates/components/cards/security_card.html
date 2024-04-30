@@ -1,0 +1,16 @@
+<div>
+  <div class="card border-primary">
+    <div class="py-4 text-center">
+      <i class="fa-solid fa-lock text-secondary fa-4x"></i>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">Security</h5>
+      <p class="card-text">Change your password</p>
+      <button type="button"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#password-modal">Change Password</button>
+    </div>
+  </div>
+  {% include 'components/modals/password_modal.html' %}
+</div>

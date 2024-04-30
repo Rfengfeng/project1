@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% set page_title = "Reports" %}
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+  <script type="text/javascript">
+    $(function () {
+      const data = {{ attendance_data | tojson }};
+      const ctx = document.getElementById('attendance-report').getContext('2d');
+      showAttendanceChart(ctx, data)
+    });
+  </script>
+  <style type="text/css">
+    canvas {
+      width: 100%;
+      height: minmax(200px, 40vh);
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">Reports</h1>
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a href="{{ url_for("report_view.home") }}"
+         class="nav-link"
+         id="revenue-tab"
+         type="button"
+         role="tab">Revenue reports</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a href="{{ url_for("report_view.workshops") }}"
+         class="nav-link"
+         id="workshops-tab"
+         type="button"
+         role="tab">Workshops</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="attendance-tab"
+              type="button"
+              role="tab"
+              aria-selected="true">Attendance</button>
+    </li>
+  </ul>
+  <div id="revenue-tab-pane" class="tab-pane fade show active">
+    <h2 class="py-4">Member Attendance</h2>
+    <form action="" method="get" class="small-form mb-4">
+      <div class="input-group">
+        <label class="input-group-text" for="date_start">Start</label>
+        <input type="date"
+               class="form-control"
+               id="date_start"
+               value="{{ date_start.strftime("%Y-%m-%d") if date_start else '' }}"
+               name="date_start">
+        <label class="input-group-text" for="date_end">End</label>
+        <input type="date"
+               class="form-control"
+               id="date_end"
+               value="{{ date_end.strftime("%Y-%m-%d") if date_end else '' }}"
+               name="date_end">
+        <button class="btn btn-primary" id="filter">View</button>
+      </div>
+    </form>
+    <div>
+      <canvas id="attendance-report"></canvas>
+    </div>
+    <table class="mt-4 table">
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th class="text-end">Lesson booked</th>
+          <th class="text-end">Lesson attended</th>
+          <th class="text-end">Workshop booked</th>
+          <th class="text-end">Workshop attended</th>
+          <th class="text-end">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attendance in attendance_data %}
+          <tr>
+            <td>
+              <a href="{{ url_for('manager_view.view_profile', id=attendance.user_id) }}"
+                 target="_blank">{{ attendance.name }}</a>
+            </td>
+            <td class="text-end">{{ attendance.lesson_booked }}</td>
+            <td class="text-end">
+              {{ attendance.lesson_attended }}
+              ({{ '{:.2f}'.format(attendance.lesson_attendance_rate * 100) }}%)
+            </td>
+            <td class="text-end">{{ attendance.workshop_booked }}</td>
+            <td class="text-end">
+              {{ attendance.workshop_attended }}
+              ({{ '{:.2f}'.format(attendance.workshop_attendance_rate * 100) }}%)
+            </td>
+            <td class="text-end">
+              {{ attendance.booking_count }} / {{
+              attendance.lesson_attended + attendance.workshop_attended
+              }} ({{ '{:.2f}'.format(attendance.overall_attendance_rate * 100) 
+              }}%)
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% with items=attendance_rows, route_args={}, route_name='report_view.attendance' %}
+      {% include 'components/pagination.html' %}
+    {% endwith %}
+  </div>
+{% endblock %}

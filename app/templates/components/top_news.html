@@ -1,0 +1,7 @@
+{% if top_news %}
+  <div class="alert alert-warning" role="alert">
+    <i class="fa-regular fa-newspaper"></i> {{ top_news.title }} <a target="_blank"
+    href="{{ url_for('news_view.view_news', id=top_news.id) }}"
+    class="alert-link ms-2">Read more.</a>
+  </div>
+{% endif %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% set page_title = location.title %}
+{% block head %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/timetable.css') }}">
+{% endblock %}
+{% block content %}
+    <h1 class="py-4">{{ location.title }}</h1>
+    <div class="mb-3">
+        <strong>Address:</strong> {{ location.full_address }}
+    </div>
+    <div>
+        <strong>Facilities</strong>
+        <p>{{ location.facilities or 'Not information available' }}</p>
+    </div>
+    <div class="mb-3">
+        <a href="https://www.google.com/maps/search/?api=1&query={{ location.full_address|urlencode }}"
+           target="_blank">View on Google Maps</a>
+    </div>
+    <h4 class="py-4">Location schedules</h4>
+    <div class="d-flex justify-content-between py-3">
+        <a href="?month_offset={{ month_offset - 1 }}&location_id={{ location.id }}"
+           class="link link-primary">&lt;&lt; Previous Month</a>
+        <a href="?month_offset=0&location_id={{ location.id }}">This Month</a>
+        <a href="?month_offset={{ month_offset + 1 }}&location_id={{ location.id }}">Next Month &gt;&gt;</a>
+    </div>
+    <div>{% include 'components/timetable.html' %}</div>
+    <div class="mb-3">
+        <h4 class="py-4">Open workshops</h4>
+        {% if location.workshops %}
+            <div class="grid-3">
+                {% for workshop in location.workshops %}
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ workshop.title }}</h5>
+                            <p class="card-text">{{ (workshop.description) | striptags | truncate(120) }}</p>
+                            <a href="{{ url_for("schedule_view.view_workshop_description", workshop_id=workshop.id) }}"
+                               class="btn btn-primary">View schedules</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No workshops available at this location.</p>
+        {% endif %}
+    </div>
+{% endblock %}

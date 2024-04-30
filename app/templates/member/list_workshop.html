@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% set page_title = "List Workshop" %}
+{% block head %}
+  <script type="text/javascript">
+    var route, action, form;
+
+    function onChangeStatusClick(e) {
+      route = e.target.getAttribute('data-route-url');  
+        action = e.target.getAttribute('data-action'); 
+        form=document.getElementById('confirmation-form');
+        form.action=route;
+        form.method='post';
+        if (action === 'confirm') {
+            $('#confirmation-modal').find('.modal-body').text('Are you sure you would like to confirm this booking?');
+        }
+      $('#confirmation-modal').modal('show');
+    }
+
+    function onConfirm() {      
+      form.submit()    
+    }
+  </script>
+{% endblock head %}
+{% block content %}
+  <h3 class="my-4 py-4">
+    <i class="fa-solid fa-people-roof text-secondary"></i>
+    Booking information for my Workshop
+  </h3>
+  <!-- Using a for loop to generate workshop information -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Workshop Title</th>
+          <th>&nbsp;</th>
+          <th>Location</th>
+          <th>Tutor</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th class="text-end">Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for schedule in schedules %}
+          <tr>
+            <td>{{ schedule.workshop.title }}</td>
+            <td>
+              {% if schedule.bookings | length > 1 %}
+                {% set tooltip_message = schedule.bookings | length ~ ' members booked' %}
+              {% elif schedule.bookings | length == 0 %}
+                {% set tooltip_message = "No member booked" %}
+              {% else %}
+                {% set tooltip_message = schedule.bookings | length ~ ' member booked' %}
+              {% endif %}
+              <button type="button"
+                      class="btn btn-outline-primary position-relative"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="right"
+                      data-bs-title="{{ tooltip_message }}">
+                <i class="fa-solid fa-users"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ schedule.bookings | length }}
+                </span>
+              </button>
+            </td>
+            <td>{{ schedule.workshop.location.title }}</td>
+            <td>{{ schedule.tutor.full_name }}</td>
+            <td>{{ schedule.start_datetime.strftime(datetime_format) }}</td>
+            <td>{{ schedule.end_datetime.strftime(datetime_format) }}</td>
+            <td class="text-end">${{ schedule.cost }}</td>
+            <td>
+              {% if current_user.id in (schedule.bookings | map(attribute='user_id')|list) %}
+                Booked
+              {% else %}
+                {% if schedule.end_datetime < current_datetime %}
+                  Expired
+                {% else %}
+                  <button type="button"
+                          onclick="onChangeStatusClick(event)"
+                          data-route-url="{{ url_for('member_view.add_booking', id=schedule.id) }}"
+                          data-action="confirm"
+                          class="btn btn-danger btn-sm">Book</button>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% with items=schedules, route_name="member_view.list_workshop", route_args={} %}
+      {% include 'components/pagination.html' %}
+    {% endwith %}
+  </div>
+  {% with title= "Please confirm", body = "Are you sure you would like to book this workshop?" %}
+    {% include 'components/modals/confirmation_modal.html' %}
+  {% endwith %}
+{% endblock %}

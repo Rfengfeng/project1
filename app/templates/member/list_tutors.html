@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% set page_title = "List Tutors" %}
+{% block content %}
+    <!-- Search bar section -->
+    <section id="searchBar" class="mb-4" style="margin-top: 35px">
+        <h3>Search Tutors</h3>
+        <form action="{{ url_for("member_view.list_tutors") }}"
+              method="post"
+              class="form-inline">
+            <input type="text"
+                   name="query"
+                   placeholder="Search by keyword"
+                   class="form-control mr-2"
+                   style="max-width: 300px">
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px">Search</button>
+        </form>
+    </section>
+    <!-- Tutor list section -->
+    <section id="tutors" class="mb-4">
+        <h3>Tutor List</h3>
+        <!-- Center-align the grid -->
+        <div class="grid-4">
+            <!-- Using a for loop to generate tutor information -->
+            {% for tutor in tutors %}
+                <div class="card">
+                    <img src="{{ url_for('static', filename=tutor.profile_image_url) }}"
+                         class="card-img-top card-profile-image"
+                         alt="Profile Picture">
+                    <div class="card-body">
+                        <!-- Display first name, last name, email, and phone number -->
+                        <h5 class="card-title">{{ tutor.first_name }} {{ tutor.last_name }}</h5>
+                        <p class="card-text">Email: {{ tutor.email }}</p>
+                        <p class="card-text">Phone number: {{ tutor.phone_number }}</p>
+                        <a href="{{ url_for('member_view.view_tutor_profile', id=tutor.id) }}"
+                           class="btn btn-secondary">View My Profile</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    <!-- Pagination -->
+    <div class="pagination" style="width: fit-content; margin: 0 auto;">
+        {% if tutors.has_prev %}
+            <a href="{{ url_for('member_view.list_tutors', page=tutors.prev_num) }}"
+               class="btn btn-primary">Previous</a>
+        {% endif %}
+        {% for page_num in tutors.iter_pages() %}
+            {% if page_num %}
+                {% if page_num == tutors.page %}
+                    <a href="{{ url_for('manager_view.list_tutors', page=page_num) }}"
+                       class="btn btn-primary active">{{ page_num }}</a>
+                {% else %}
+                    <a href="{{ url_for('manager_view.list_tutors', page=page_num) }}"
+                       class="btn btn-primary">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+        {% if tutors.has_next %}
+            <a href="{{ url_for('manager_view.list_tutors', page=tutors.next_num) }}"
+               class="btn btn-primary">Next</a>
+        {% endif %}
+    </div>
+{% endblock %}

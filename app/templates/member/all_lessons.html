@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% set page_title = "All Lesson Schedules" %}
+{% set datetime = namespace(now=now) %}
+{% block content %}
+    <h2>Search for a Lesson</h2>
+    <section id="searchBar" class="mb-4" style="margin-top: 35px">
+        <form action="{{ url_for("member_view.all_lessons") }}"
+              class="form-inline"
+              method="get">
+            <input type="text"
+                   name="search"
+                   placeholder="Search by tutor name or lesson title"
+                   class="form-control mr-2"
+                   style="max-width: 300px"
+                   value="{{ search_query or '' }}">
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px">Search</button>
+        </form>
+    </section>
+    <h2>Lesson Schedules</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Lesson Title</th>
+                <th>Tutor</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Price</th>
+                <th>Booking</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in schedules %}
+                {% set lesson = schedule.lesson %}
+                <tr>
+                    <td>{{ lesson.title }}</td>
+                    <td>{{ schedule.tutor.full_name }}</td>
+                    <td>{{ schedule.start_datetime }}</td>
+                    <td>{{ schedule.end_datetime }}</td>
+                    <td>{{ schedule.cost }}</td>
+                    <td>
+                        {% if schedule.bookings %}
+                            {% set booking = schedule.bookings[0] %}
+                            {% if booking.status == BookingStatus.confirmed.value %}
+                                {% if booking.user == current_user %}
+                                    <p style="color: green;">booked by {{ current_user.full_name }}</p>
+                                {% else %}
+                                    Unavailable
+                                {% endif %}
+                            {% elif booking.status == BookingStatus.pending.value %}
+                                {% if booking.user == current_user %}
+                                    pending payment
+                                    <form action="{{ url_for("payment_view.booking_get", booking_id=booking.id) }}"
+                                          method="get">
+                                        <button type="submit" class="btn btn-primary payment-button">Pay now</button>
+                                    </form>
+                                {% else %}
+                                    unavailable
+                                {% endif %}
+                            {% else %}
+                                {{ booking.status }}
+                            {% endif %}
+                        {% else %}
+                            <form action="{{ url_for("member_view.book_lesson", schedule_id=schedule.id) }}"
+                                  method="post">
+                                <button type="submit" class="btn btn-primary">Book</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% with items=schedules, route_args={'search': search_query}, route_name="member_view.all_lessons" %}
+        {% include 'components/pagination.html' %}
+    {% endwith %}
+{% endblock %}

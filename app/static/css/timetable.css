@@ -1,0 +1,33 @@
+.timetable {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-left: 1px solid var(--bs-gray-300);
+  border-top: 1px solid var(--bs-gray-300);
+}
+
+.timetable .week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.timetable .week .day {
+  min-height: 4rem;
+  border-right: 1px solid var(--bs-gray-300);
+  border-bottom: 1px solid var(--bs-gray-300);
+}
+.timetable .week .day small {
+  font-size: 0.75rem;
+}
+.timetable .week .day:not(.in-month) {
+  > * {
+    opacity: 0.5;
+  }
+}
+
+.timetable .booking {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.timetable .week .weekend {
+  background-color: rgba(var(--bs-primary-rgb), 0.05);
+}

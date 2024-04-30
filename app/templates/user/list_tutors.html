@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% set page_title = "List Tutors" %}
+{% block content %}
+    <h3 class="my-4 py-4">
+        <i class="fa-solid fa-graduation-cap text-secondary"></i>
+        Tutors
+    </h3>
+    <!-- Using a for loop to generate tutors information -->
+    <div class="grid-4 py-4">
+        {% for tutor in tutors %}
+            <div class="card border-primary">
+                <img src="{{ url_for('static', filename=tutor.profile_image_url) }}"
+                     class="card-img-top card-profile-image"
+                     alt="{{ tutor.first_name }} {{ tutor.last_name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ tutor.first_name }} {{ tutor.last_name }}</h5>
+                    <p class="card-text">Email: {{ tutor.email }}</p>
+                    <p class="card-text">Phone number: {{ tutor.phone_number }}</p>
+                    <a href="{{ url_for("tutor_view.view_tutor", tutor_id=tutor.id) }}"
+                       class="btn btn-primary">View Tutors Profile</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

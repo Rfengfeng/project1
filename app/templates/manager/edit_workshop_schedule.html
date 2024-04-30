@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% set page_title = "Edit Workshop Schedule" %}
+{% block content %}
+    <h2 class="my-4 py-4">Edit Workshop Schedule</h2>
+    <form method="post"
+          action="{{ url_for('manager_view.edit_workshop_schedule', id=schedule.id) }}"
+          class="needs-validation"
+          novalidate>
+        <input type="hidden" name="workshop_id" value="{{ schedule.workshop.id }}">
+        <div class="mb-3">
+            <label for="workshop_title" class="form-label">Workshop Name:</label>
+            <input type="text"
+                   id="workshop_title"
+                   name="workshop_title"
+                   value="{{ schedule.workshop.title }}"
+                   class="form-control"
+                   required
+                   disabled>
+            <div class="invalid-feedback">Please provide a Workshop name.</div>
+        </div>
+        <div class="mb-3">
+            <label for="start_datetime" class="form-label">Start Datetime:</label>
+            <input type="datetime-local"
+                   id="start_datetime"
+                   name="start_datetime"
+                   value="{{ schedule.start_datetime.strftime("%Y-%m-%dT%H:%M") }}"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a start datetime.</div>
+        </div>
+        <div class="mb-3">
+            <label for="end_datetime" class="form-label">End datetime:</label>
+            <input type="datetime-local"
+                   id="end_datetime"
+                   name="end_datetime"
+                   value="{{ schedule.end_datetime.strftime("%Y-%m-%dT%H:%M") }}"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a valid end_datetime.</div>
+        </div>
+        <div class="mb-3">
+            <label for="tutor_id" class="form-label">Tutor:</label>
+            <select id="tutor_id" name="tutor_id" class="form-select" required>
+                <option value="" disabled selected>Select Tutor</option>
+                {% for tutor in tutors %}
+                    <option value="{{ tutor.id }}" {{ 'selected' if tutor.id == tutor_id else '' }}>{{ tutor.full_name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a Tutor.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Workshop Infomation</button>
+    </form>
+{% endblock %}

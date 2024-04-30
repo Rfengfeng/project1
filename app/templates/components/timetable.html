@@ -1,0 +1,29 @@
+<div class="timetable">
+  <div class="week heading">
+    <div class="day fw-bold p-2">Monday</div>
+    <div class="day fw-bold p-2">Tuesday</div>
+    <div class="day fw-bold p-2">Wednesday</div>
+    <div class="day fw-bold p-2">Thursday</div>
+    <div class="day fw-bold p-2">Friday</div>
+    <div class="day fw-bold weekend p-2">Saturday</div>
+    <div class="day fw-bold weekend p-2">Sunday</div>
+  </div>
+  {% for table_entry in table_entries %}
+    {% if table_entry.date.weekday() == 0 %}<div class="week">{% endif %}
+      <div class="day {{ 'text-primary in-month' if table_entry.is_in_month else '' }}{{ ' fw-bold border border-primary' if table_entry.is_today else '' }}{{ ' weekend' if table_entry.date.weekday() in [5,6] else '' }}">
+        <div class="px-1">
+          {{ table_entry.date.day }} {{ table_entry.date.strftime("%b") if table_entry.date.day ==1 else '' }}
+        </div>
+        {% for entry in table_entry.entries %}
+          <small class="booking bg-secondary bg-opacity-25 mb-1 px-1"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="bottom"
+                 data-bs-title="{{ (entry.lesson.title if entry.lesson else entry.workshop.title) + ' ' + entry.start_datetime.strftime("%I:%M%p") + ' - ' + entry.end_datetime.strftime('%I:%M%p') }}">
+            <div class="title">{{ 'Lesson' if entry.lesson_id else 'Workshop' }}</div>
+            <div class="time">{{ entry.start_datetime.strftime(time_format) }}</div>
+          </small>
+        {% endfor %}
+      </div>
+      {% if table_entry.date.weekday() == 6 %}</div>{% endif %}
+  {% endfor %}
+</div>

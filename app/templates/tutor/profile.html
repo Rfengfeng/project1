@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% set page_title = "Profile" %}
+{% block content %}
+  <div>
+    <h2 class="py-4">Tutor Profile</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <img src="{{ url_for('static', filename=member.profile_image_url) }}"
+             class="card-img-top card-profile-image"
+             alt="...">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <strong>Title:</strong> {{ member.title or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>First Name:</strong> {{ member.first_name }}
+          </li>
+          <li class="list-group-item">
+            <strong>Last Name:</strong> {{ member.last_name }}
+          </li>
+          <li class="list-group-item">
+            <strong>Position:</strong> {{ member.position or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Phone Number:</strong> {{ member.phone_number or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Email:</strong> {{ member.email or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Address:</strong> {{ member.address or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Teaching Subjects:</strong> {{ member.teaching_subjects or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Years of Experience:</strong> {{ member.years_of_experience or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Qualifications:</strong> {{ member.qualification or '-' }}
+          </li>
+          <li class="list-group-item">
+            <strong>Introduction:</strong>
+            <div>{{ member.introduction or '-' }}</div>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h3 class="pb-4">Lessons:</h3>
+        <ul class="list-group">
+          {% for lesson in member.lessons %}<li class="list-group-item">{{ lesson.title }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}

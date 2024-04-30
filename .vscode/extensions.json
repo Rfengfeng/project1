@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "samuelcolvin.jinjahtml",
+    "monosans.djlint",
+    "esbenp.prettier-vscode",
+    "ms-python.vscode-pylance",
+    "ms-python.pylint",
+    "ms-python.python",
+    "ms-python.debugpy",
+    "donjayamanne.python-environment-manager",
+    "eamodio.gitlens",
+    "ms-python.autopep8"
+  ]
+}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% set page_title = "Pricing" %}
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Join Our Exclusive Merino Membership Today!</h1>
+        <p class="lead">
+            Elevate your merino breeding skills with our membership! Engage in weekly workshops, benefit from one-on-one sessions with experts, and contribute to the thriving merino community. Your subscription not only boosts your knowledge but also supports the industry's growth. Join us today and be part of a forward-moving merino network!
+        </p>
+    </div>
+    <div class="container">
+        <div class="row">
+            {% for subscription in subscriptions %}
+                <div class="col-md-6">
+                    <div class="card mb-4 box-shadow" style="max-width: 300px; margin: auto;">
+                        <div class="card-header">
+                            <h4 class="my-0 font-weight-normal">{{ subscription.title }}</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">${{ subscription.discounted_price }}</h1>
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>{{ subscription.description }}</li>
+                                <li>Weekly merino workshops</li>
+                                <li>One-on-one expert sessions</li>
+                                <li>Support the merino community</li>
+                                <li>Exclusive breeding insights</li>
+                            </ul>
+                            <form action="{{ url_for('subscription_view.checkout', user=user, user_id=user.id, subscription_id=subscription.id) }}"
+                                  method="get">
+                                <button type="submit" class="btn btn-lg btn-block btn-primary">Subscribe Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

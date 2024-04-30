@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% set page_title = "List Members" %}
+{% block content %}
+    <!-- Add Member section -->
+    <section id="addMember" class="mb-4">
+        <h3>Add a New Member</h3>
+        <!-- Add Member button -->
+        <a href="{{ url_for("manager_view.add_member") }}"
+           class="btn btn-primary">Add a New Member</a>
+    </section>
+    <!-- Search bar section -->
+    <section id="searchBar" class="mb-4" style="margin-top: 35px">
+        <h3>Search Members</h3>
+        <form action="{{ url_for("manager_view.list_members") }}"
+              method="post"
+              class="form-inline">
+            <input type="text"
+                   name="query"
+                   placeholder="Search by keyword"
+                   class="form-control mr-2"
+                   style="max-width: 300px">
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px">Search</button>
+        </form>
+    </section>
+    <!-- Member list section -->
+    <section id="members" class="mb-4">
+        <h3>Member List</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Membership Expiry</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Using a for loop to generate member information -->
+                {% for member in members %}
+                    <tr>
+                        <td>{{ member.full_name }}</td>
+                        <td>{{ member.email }}</td>
+                        <td>{{ member.phone_number or '' }}</td>
+                        <td>{{ member.membership_expiry.strftime(date_format) if member.membership_expiry else 'No membership' }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('manager_view.view_profile', id=member.id) }}"
+                               class="btn btn-secondary">View Details</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    <!-- Pagination -->
+    {% with items=members, route_args = {'query': query}, route_name='manager_view.list_members' %}
+        {% include 'components/pagination.html' %}
+    {% endwith %}
+{% endblock %}

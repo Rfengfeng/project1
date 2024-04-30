@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% set page_title = "List lesson" %}
+{% block content %}
+    <h3 class="my-4 py-4">
+        <i class="fa-solid fa-graduation-cap text-secondary"></i>
+        Lessons
+    </h3>
+    <div class="grid-3 py-4">
+        {% for lesson in lessons %}
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">{{ lesson.title }}</h5>
+                    <div class="card-text">
+                        <div>
+                            Taught by <strong>{{ lesson.tutor.full_name }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for schedule in lesson.schedules[:3] %}
+                        <li class="list-group-item d-flex align-items-center">
+                            <small>{{ schedule.start_datetime.strftime(datetime_format) }}</small>
+                            <button class="btn btn-sm btn-primary ms-auto">Book</button>
+                        </li>
+                    {% endfor %}
+                    {% if lesson.schedules|length > 3 %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('lesson_view.list_schedules', lesson_id=lesson.id) }}"
+                               class="btn btn-primary">View All Schedules {{ (lesson.schedules|length) - 3 }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

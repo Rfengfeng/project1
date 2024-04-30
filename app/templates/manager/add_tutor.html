@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% set page_title = "Add Tutor" %}
+{% block content %}
+    <h2>Add a new tutor</h2>
+    <form method="post"
+          action="{{ url_for("manager_view.add_tutor") }}"
+          class="needs-validation"
+          novalidate>
+        <label for="first_name">First Name:</label>
+        <br>
+        <input type="text"
+               id="first_name"
+               name="first_name"
+               required
+               class="form-control">
+        <div class="invalid-feedback">Please enter a first name.</div>
+        <br>
+        <label for="last_name">Last Name:</label>
+        <br>
+        <input type="text"
+               id="last_name"
+               name="last_name"
+               required
+               class="form-control">
+        <div class="invalid-feedback">Please enter a last name.</div>
+        <br>
+        <label for="email">Email:</label>
+        <br>
+        <input type="email"
+               id="email"
+               name="email"
+               required
+               autocomplete="off"
+               class="form-control">
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+        <br>
+        <label for="password">Password:</label>
+        <br>
+        <input type="password"
+               id="password"
+               name="password"
+               required
+               autocomplete="off"
+               class="form-control">
+        <div class="invalid-feedback">Please enter a password.</div>
+        <br>
+        <label for="confirm_password">Confirm Password:</label>
+        <br>
+        <input type="password"
+               id="confirm_password"
+               name="confirm_password"
+               required
+               class="form-control">
+        <div class="invalid-feedback">Please confirm your password.</div>
+        <br>
+        <br>
+        <input type="submit" value="Add tutor" class="btn btn-primary">
+    </form>
+{% endblock %}

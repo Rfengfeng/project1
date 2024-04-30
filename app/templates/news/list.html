@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% set page_title = "News" %}
+{% block content %}
+  <h1 class="p-4">News</h1>
+  <div class="mb-4">
+    <form action="" class="me-4 w-50">
+      <div class="input-group">
+        <input type="text"
+               id="search"
+               class="form-control"
+               name="search_string"
+               placeholder="Search news"
+               value="{{ request.args.get("search_string") or '' }}" />
+        <button class="btn btn-outline-primary">Search</button>
+      </div>
+    </form>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Published</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for news in news_list %}
+        <tr>
+          <td>
+            <a href="{{ url_for('news_view.view_news', id=news.id) }}">{{ news.title }}</a>
+          </td>
+          <td>{{ news.author }}</td>
+          <td>{{ news.published_at.strftime(date_format) }}</td>
+        </tr>
+      {% endfor %}
+      {% if not news_list.items %}
+        <tr>
+          <td colspan="3">No news found</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+  {% with items=news_list, route_args = {}, route_name='news_view.list_news' %}
+    {% include 'components/pagination.html' %}
+  {% endwith %}
+{% endblock %}

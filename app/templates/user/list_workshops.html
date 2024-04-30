@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% set page_title = "List workshops" %}
+{% block content %}
+    <h3 class="my-4 py-4">
+        <i class="fa-solid fa-people-roof text-secondary"></i>
+        Workshops
+    </h3>
+    <!-- Using a for loop to generate workshops information -->
+    <div class="grid-4 py-4">
+        {% for workshop in workshops %}
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">{{ workshop.title }}</h5>
+                    <p class="card-text">
+                        Location:
+                        <br />
+                        {{ workshop.location }}
+                    </p>
+                    <p class="card-text">Price: {{ workshop.price }}</p>
+                    <a href="{{ url_for("schedule_view.view_workshop_description", workshop_id=workshop.id) }}"
+                       class="btn btn-primary">View schedules</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

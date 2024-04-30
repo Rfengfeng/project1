@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% set page_title = "Register" %}
+{% block head %}
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='js/password_modal.js') }}"></script>
+{% endblock %}
+{% block content %}
+    <!-- title -->
+    <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+    <form method="post" action="{{ url_for("user_view.register") }}">
+        <div class="form-floating mb-3">
+            <input type="email"
+                   class="form-control"
+                   id="email"
+                   name="email"
+                   placeholder="Email"
+                   required
+                   maxlength="64"
+                   value="{{ request.form.get('email', '') }}">
+            <label for="email">Email</label>
+        </div>
+        <div class="form-floating mb-3 position-relative">
+            <input type="password"
+                   class="form-control"
+                   id="password"
+                   name="password"
+                   placeholder="Password"
+                   required
+                   maxlength="20"
+                   minlength="8"
+                   value="{{ request.form.get('password', '') }}">
+            <span class="password-toggle" onclick="toggleVisibility('password')">
+                <i class="fa-regular fa-eye-slash"></i>
+            </span>
+            <label for="password">Password</label>
+        </div>
+        <div class="form-floating mb-3 position-relative">
+            <input type="password"
+                   class="form-control"
+                   id="confirm_password"
+                   name="confirm_password"
+                   placeholder="Confirm Password"
+                   required
+                   maxlength="20"
+                   minlength="8">
+            <span class="password-toggle"
+                  onclick="toggleVisibility('confirm_password')">
+                <i class="fa-regular fa-eye-slash"></i>
+            </span>
+            <label for="confirm_password">Confirm Password</label>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col">
+                <div class="form-floating">
+                    <select class="form-control" id="title" name="title" required>
+                        <option value="">Please select...</option>
+                        <option value="Mr." {{ "selected" if request.form.get("title") == "Mr." else "" }}>Mr.
+                        </option>
+                        <option value="Miss." {{ "selected" if request.form.get("title") == "Miss." else "" }}>Miss.
+                        </option>
+                        <option value="Mrs." {{ "selected" if request.form.get("title") == "Mrs." else "" }}>Mrs.
+                        </option>
+                    </select>
+                    <label for="title">Title</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="first_name"
+                           name="first_name"
+                           placeholder="First Name"
+                           required
+                           maxlength="32"
+                           value="{{ request.form.get('first_name', '') }}">
+                    <label for="first_name">First Name</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="last_name"
+                           name="last_name"
+                           placeholder="Last Name"
+                           required
+                           maxlength="32"
+                           value="{{ request.form.get('last_name', '') }}">
+                    <label for="last_name">Last Name</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <select class="form-control" id="position" name="position" required>
+                <option value="">Select your position...</option>
+                <option value="student">Student</option>
+                <option value="retired">I am retired</option>
+                <option value="farmer">Farmer</option>
+                <option value="others">Others</option>
+            </select>
+            <label for="position">Positon</label>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col">
+                <div class="form-floating">
+                    <input type="date"
+                           class="form-control"
+                           id="date_of_birth"
+                           name="date_of_birth"
+                           placeholder="Date of Birth"
+                           required
+                           value="{{ request.form.get('date_of_birth', '') }}" />
+                    <label for="date_of_birth">Date of Birth</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="tel"
+                   class="form-control"
+                   id="phone_number"
+                   name="phone_number"
+                   placeholder="Eg. +6422334455 or 022334455"
+                   pattern="(?:0|\+)[0-9]{4,20}"
+                   title="Phone number must start with 0 or + and be 4 to 20 digits long."
+                   required
+                   value="{{ request.form.get('phone_number', '') }}">
+            <label for="phone_number">Phone Number</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text"
+                   class="form-control"
+                   id="address"
+                   name="address"
+                   placeholder="Address"
+                   maxlength="128"
+                   value="{{ request.form.get('address', '') }}">
+            <label for="address">Address</label>
+        </div>
+        {% block button %}
+            <button class="btn btn-primary w-100 mb-3" type="submit">Sign up and Subscribe</button>
+            <div class="text-end">
+                <a href="{{ url_for("user_view.login") }}"
+                   class="link-secondary link-offset-2">Already have an account? Sign in</a>
+            </div>
+        {% endblock %}
+    </form>
+{% endblock %}

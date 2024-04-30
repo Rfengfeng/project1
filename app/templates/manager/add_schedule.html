@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% set page_title = "Add Schedule" %}
+{% block content %}
+    <h2>
+        <i class="fas fa-chalkboard-teacher"></i>Add a New Schedule
+    </h2>
+    <div style="margin-bottom: 20px;"></div>
+    <form action="{{ url_for("manager_view.add_schedule", lesson_id = lesson_id) }}"
+          method="post">
+        <div class="mb-3">
+            <label for="start_datetime" class="form-label">Start time:</label>
+            <input type="datetime-local"
+                   id="start_datetime"
+                   name="start_datetime"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a start_datetime.</div>
+        </div>
+        <div class="mb-3">
+            <label for="end_datetime" class="form-label">End time:</label>
+            <input type="datetime-local"
+                   id="end_datetime"
+                   name="end_datetime"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a end_datetime.</div>
+        </div>
+        <div class="form-group">
+            <label for="tutor">Tutor:</label>
+            <select class="form-control" id="tutor" name="tutor" required>
+                <option value="" disabled selected>Select a tutor</option>
+                {% for tutor in tutors %}<option value="{{ tutor.id }}">{{ tutor.full_name }}</option>{% endfor %}
+            </select>
+            <div class="invalid-feedback">Please assign a tutor for the schedule.</div>
+        </div>
+        <div style="margin-top: 20px;"></div>
+        <button type="submit" class="btn btn-primary">Add schedule</button>
+    </form>
+{% endblock %}

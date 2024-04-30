@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% set page_title = "Book a lesson" %}
+{% set datetime = namespace(now=now) %}
+{% block content %}
+    <h1>Booking Details</h1>
+    <p>Hey {{ current_user.first_name }}, please confirm your booking details!</p>
+    <div class="confirmation-section">
+        <p>Lesson Details:</p>
+        <ul>
+            <li>
+                <i class="fas fa-book icon"></i>Lesson Title: {{ schedule.lesson.title }}
+            </li>
+            <li>
+                <i class="fas fa-user icon"></i>Type: One-on-one Lesson
+            </li>
+            <li>
+                <i class="fas fa-chalkboard-teacher icon"></i>Tutor: {{ schedule.tutor.full_name }}
+            </li>
+            <li>
+                <i class="fas fa-globe icon"></i>Venue: Online meeting, details will be sent to your email.
+            </li>
+            <li>
+                <i class="fas fa-dollar-sign icon"></i>Cost: {{ schedule.cost }} (GST included)
+            </li>
+            <li>
+                <i class="far fa-calendar-alt icon"></i>Start Datetime: {{ schedule.start_datetime.strftime(datetime_format) }}
+            </li>
+            <li>
+                <i class="far fa-calendar-alt icon"></i>End Datetime: {{ schedule.end_datetime.strftime(datetime_format) }}
+            </li>
+        </ul>
+    </div>
+    <p>Pay now to secure the booking!</p>
+    <form action="{{ url_for("payment_view.booking_get", booking_id=booking.id) }}"
+          method="get">
+        <button type="submit" class="btn btn-primary payment-button">Pay now</button>
+    </form>
+{% endblock %}

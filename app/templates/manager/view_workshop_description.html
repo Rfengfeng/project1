@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% set page_title = ("Workshop " ~ workshop.title) %}
+{% block content %}
+    <h1 class="py-4">Workshop - {{ workshop.title }}</h1>
+    <div>
+        <p>
+            <strong>Location:</strong> {{ workshop.location }}
+        </p>
+        <p>{{ workshop.description | safe }}</p>
+    </div>
+    <h4 class="py-4">Schedules</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Tutor</th>
+                <th class="text-end">Members booked</th>
+                <th class="text-end">Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in workshop.schedules | sort(attribute='start_datetime', reverse = True) %}
+                <tr>
+                    <td>{{ schedule.start_datetime.strftime(date_format) }}</td>
+                    <td>{{ schedule.start_datetime.strftime(time_format) }}</td>
+                    <td>{{ schedule.end_datetime.strftime(time_format) }}</td>
+                    <td>{{ schedule.tutor.full_name }}</td>
+                    <td class="text-end">
+                        <button type="button"
+                                class="btn btn-outline-primary position-relative"
+                                data-bs-toggle="tooltip"
+                                title="Members booked">
+                            <i class="fa-users fa-solid"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ schedule.bookings | length }}</span>
+                        </button>
+                    </td>
+                    <td class="text-end">${{ '{:,.2f}'.format(schedule.cost) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

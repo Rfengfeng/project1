@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% set page_title = "Workshop Attendance" %}
+{% block head %}
+  <script type="text/javascript"
+          src="{{ url_for('static', filename='js/attendance.js') }}"></script>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">{{'Workshop' if schedule.workshop_id else 'Lesson' }} Attendance</h1>
+  <div class="pb-4">
+    <h3 class="pb-2">{{ schedule.workshop.title }}</h3>
+    <div>
+      <i class="fa-solid fa-location-dot"></i>
+      {{ schedule.workshop.location }}
+    </div>
+    <div>
+      <i class="fa-regular fa-calendar"></i>
+      {{ schedule.start_datetime.strftime(datetime_format) }} - {{ schedule.end_datetime.strftime(datetime_format) }}
+    </div>
+  </div>
+  <form id="attendance-form"
+        onsubmit="onAttendFormSubmit(event)"
+        action="{{ url_for("booking_api.attend_bookings") }}">
+    <div class="text-end">
+      <button type="submit" class="btn btn-primary">Mark as Attended</button>
+    </div>
+    <div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+            <tr>
+              <td>
+                {% if not booking.attended %}<input type="checkbox" name="booking_ids" value="{{ booking.id }}" />{% endif %}
+              </td>
+              <td>{{ booking.user.full_name }}</td>
+              <td>{{ booking.user.email }}</td>
+              <td class="text-end">
+                {% if booking.attended %}
+                  <a href="#" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-check"></i> Attended</a>
+                {% else %}
+                  <button data-url="{{ url_for('booking_api.attend_booking', id=booking.id) }}"
+                          type="button"
+                          onclick="onAttendClick(event)"
+                          class="btn btn-primary btn-sm">Record Attendance</button>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          {% if not bookings %}
+            <tr>
+              <td colspan="4" class="text-center">No bookings found</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </form>
+    {% with title="Please confirm", body="Are you sure you want to record this attendance?", confirm_onclick="submitAttendance()" %}
+      {% include 'components/modals/confirmation_modal.html' %}
+    {% endwith %}
+  </div>
+{% endblock content %}

@@ -1,0 +1,19 @@
+<div class="profile-image {{ size }} {{ 'editable' if editable else '' }}"
+     {% if editable %} data-bs-toggle="tooltip" data-bs-title="Click to update image" data-bs-placement="bottom" onclick="$('#profile-image-modal').modal('show')" {% endif %}>
+  {% if session['user']['profile_image_url'] %}
+    {% set image_id = 'profile-image-' ~ session['user']['id'] %}
+    <img id="{{ image_id }}"
+         src="{{ url_for('static', filename=session['user']['profile_image_url']) }}"
+         alt="Profile Image"
+         class="img-thumbnail">
+  {% else %}
+    <div class="image-placeholder">
+      <i class="fa-regular fa-user fa-5x"></i>
+    </div>
+  {% endif %}
+  {% if editable %}
+    {% with action_url = url_for('user_api.update_profile_picture'), image_target = image_id %}
+      {% include 'components/modals/profile_image_modal.html' %}
+    {% endwith %}
+  {% endif %}
+</div>

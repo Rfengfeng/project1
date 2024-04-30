@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% set page_title = "Payment Tracking" %}
+{% block content %}
+    <h1>Payment Tracking</h1>
+    <!-- Search bar section -->
+    <section id="searchBar" class="mb-4" style="margin-top: 35px">
+        <h3>Search Payments</h3>
+        <form action="{{ url_for("track_payments_view.track_payments") }}"
+              method="get"
+              class="form-inline">
+            <input type="text"
+                   name="search"
+                   placeholder="Search by name or items"
+                   class="form-control mr-2"
+                   style="max-width: 300px"
+                   value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px">Search</button>
+        </form>
+    </section>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Item</th>
+                <th class="text-end">Amount</th>
+                <th>Payment Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+                <tr>
+                    <td>
+                        <span data-bs-toggle="tooltip"
+                              data-bs-title="{{ payment.paid_at.strftime(datetime_format) }}">
+                            {{ payment.paid_at.strftime(date_format) }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('manager_view.view_profile', id=payment.user_id) }}">{{ payment.first_name }} {{ payment.last_name }}</a>
+                    </td>
+                    <td>{{ payment.email }}</td>
+                    <td>{{ payment.payment_type }}</td>
+                    <td class="text-end">
+                        <div class="text-success">${{ '{:,.2f}'.format(payment.amount_paid or 0) }}</div>
+                        {% if payment.refunded_amount %}
+                            <div class="text-danger">-${{ '{:,.2f}'.format(payment.refunded_amount or 0) }}</div>
+                            <div>Refunded on {{ payment.refunded_at.strftime(date_format) }}</div>
+                        {% endif %}
+                    </td>
+                    <td>{{ payment.status }}</td>
+                    <td>
+                        <a href="{{ url_for('track_payments_view.payment_details', payment_id=payment.id) }} "
+                           class="btn btn-primary">Details</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Pagination -->
+    {% with route_args={}, items=payments, route_name = 'track_payments_view.track_payments' %}
+        {% include 'components/pagination.html' %}
+    {% endwith %}
+{% endblock %}

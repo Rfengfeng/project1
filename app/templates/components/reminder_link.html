@@ -1,0 +1,5 @@
+{% if reminder_count %}
+  <div class="fs-5 fw-normal">
+    <i class="fa-solid fa-bell"></i>You have <a href="{{ url_for("user_view.list_reminders") }}">{{ reminder_count }} {{ 'reminder' if reminder_count == 1 else 'reminders' }}</a>
+  </div>
+{% endif %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% set page_title = "Renew Subscription" %}
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Renew Your Membership!</h1>
+        <p class="lead">
+            Continue your journey with our merino membership! Keep accessing our exclusive resources, workshops, and expert sessions. Renew today to sustain your growth in the merino breeding community.
+        </p>
+    </div>
+    <div class="container">
+        <div class="row">
+            {% for subscription in subscriptions %}
+                <div class="col-md-6">
+                    <div class="card mb-4 box-shadow" style="max-width: 300px; margin: auto;">
+                        <div class="card-header">
+                            <h4 class="my-0 font-weight-normal">{{ subscription.title }}</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">${{ subscription.discounted_price }}</h1>
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>{{ subscription.description }}</li>
+                                <li>Weekly merino workshops</li>
+                                <li>One-on-one expert sessions</li>
+                                <li>Support the merino community</li>
+                                <li>Exclusive breeding insights</li>
+                            </ul>
+                            <form action="{{ url_for('subscription_view.renew_checkout', user_id=user.id, subscription_id=subscription.id) }}"
+                                  method="get">
+                                <button type="submit" class="btn btn-lg btn-block btn-primary">Confirm Renew</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

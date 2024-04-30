@@ -1,0 +1,38 @@
+<div class="modal fade"
+     id="confirmation-modal"
+     tabindex="-1"
+     aria-labelledby="confirmation-modal-label"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{{ action_url }}"
+            method="post"
+            id="confirmation-form"
+            onsubmit="event.preventDefault()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmation-modal-label">{{ title }}</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">{{ body|safe }}</div>
+        <div class="modal-footer">
+          <div id="error-message" class="d-none text-danger me-auto"></div>
+          <div class="d-flex w-100 justify-content-between">
+            <button id="btn-cancel"
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">No</button>
+            <button id="btn-confirm"
+                    type="button"
+                    class="{{ confirm_btn_class if confirm_btn_class else 'btn btn-danger' }}"
+                    onclick="{{ confirm_onclick if confirm_onclick else 'onConfirm(event) ' }}">
+              {{ confirm_btn_text if confirm_btn_text else 'Yes' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

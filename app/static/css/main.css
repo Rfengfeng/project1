@@ -1,0 +1,75 @@
+body {
+  min-height: 100vh;
+}
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(25% - 3rem), 1fr));
+  gap: 3rem;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(33.3333% - 2rem), 1fr));
+  gap: 2rem;
+}
+
+.toast-fixed {
+  top: 4rem;
+  left: 50%;
+}
+.toast-container {
+  z-index: 1080; /* Use the same z-index as tooltips */
+  min-width: 400px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.password-toggle:hover {
+  opacity: 0.8;
+}
+
+.profile-image {
+  max-width: 150px;
+  aspect-ratio: 1/1;
+  cursor: pointer;
+}
+.card-profile-image {
+  aspect-ratio: 1/1;
+  object-fit: contain;
+}
+.profile-image.editable:hover {
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+.profile-image.xl {
+  max-width: 300px;
+}
+.profile-image.lg {
+  max-width: 200px;
+}
+.profile-image.full {
+  max-width: 100%;
+}
+.profile-image.sm {
+  max-width: 100px;
+}
+.profile-image.xs {
+  max-width: 50px;
+}
+.profile-image img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  aspect-ratio: 1/1;
+}
+.small-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.medium-form {
+  max-width: 800px;
+  margin: 0 auto;
+}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% set page_title = "Edit A Workshop" %}
+{% block head %}
+    <style type="text/css">
+    .ck-editor__editable[role="textbox"] {
+      /* Editing area */
+      min-height: 200px;
+    }
+    </style>
+    <script type="text/javascript">
+    $(function () {
+      ClassicEditor
+        .create(document.querySelector('#workshop_description'), {
+          heading: {
+              options: [
+                  { model: 'paragraph', title: 'Paragraph', class: '' },
+                  { model: 'heading1', view: 'h1', title: 'Heading 1', class: '' },
+                  { model: 'heading2', view: 'h2', title: 'Heading 2', class: '' },
+                  { model: 'heading3', view: 'h3', title: 'Heading 3', class: '' },
+                  { model: 'heading4', view: 'h4', title: 'Heading 4', class: '' },
+                  { model: 'heading5', view: 'h5', title: 'Heading 5', class: '' },
+                  { model: 'heading6', view: 'h6', title: 'Heading 6', class: '' },
+              ],
+          },
+          toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ],
+        }).catch(error => {
+            console.error( error );
+        });
+    });
+    </script>
+{% endblock %}
+{% block content %}
+    <h2 class="my-4 py-4">Edit A Workshop</h2>
+    <form method="post"
+          action="{{ url_for("manager_view.edit_workshop_db", workshop_id=workshop.id) }}"
+          class="needs-validation"
+          novalidate>
+        <div class="mb-3">
+            <label for="workshop_name" class="form-label">Workshop Name</label>
+            <input type="text"
+                   id="workshop_name"
+                   name="workshop_name"
+                   class="form-control"
+                   value="{{ workshop.title }}"
+                   required>
+            <input type="hidden"
+                   id="workshop_id"
+                   name="workshop_id"
+                   class="form-control"
+                   value="{{ workshop.id }}"
+                   required>
+            <div class="invalid-feedback">Please provide a workshop name.</div>
+        </div>
+        <div class="mb-3">
+            <label for="location_id" class="form-label">Location:</label>
+            <select id="location_id" name="location_id" class="form-select" required>
+                <option value="" disabled>Select location</option>
+                {% for location in locations %}
+                    <option value="{{ location.id }}"
+                            {% if workshop and location.id == workshop.location_id %}selected{% endif %}>
+                        {{ location.address1 }}
+                    </option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a location.</div>
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number"
+                   id="price"
+                   name="price"
+                   class="form-control"
+                   value="{{ workshop.price or '0.00' }}"
+                   min="0"
+                   step="0.01"
+                   required>
+            <div class="invalid-feedback">Please provide a price.</div>
+        </div>
+        <div class="form-group">
+            <label for="workshop_description" class="form-label">Workshop Description</label>
+            <textarea class="form-control"
+                      name="workshop_description"
+                      id="workshop_description"
+                      rows="10"
+                      required>{{ workshop.description if workshop else '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.3.0/classic/ckeditor.js"></script>
+{% endblock %}

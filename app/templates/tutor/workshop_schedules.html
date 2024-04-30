@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% set page_title = "Manage workshop Schedule" %}
+{% set datetime = namespace(now=now) %}
+{% block head %}{% endblock %}
+{% block content %}
+  <h2 class="py-4">Workshop Schedule</h2>
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <form method="get"
+            action="{{ url_for("tutor_view.workshop_schedules") }}"
+            class="d-flex">
+        <input type="text"
+               id="search"
+               name="search"
+               class="form-control me-2"
+               placeholder="Enter Keyword">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+    {# <div class="col-md-6 text-end">
+      <a href="{{ url_for("tutor_view.create_workshop_schedule") }}"
+         class="btn btn-primary">Create new Schedule</a>
+    </div> #}
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Workshop Title</th>
+        <th>Location</th>
+        <th>Start time</th>
+        <th>End time</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for schedule in schedules.items %}
+        {% set workshop = schedule.workshop %}
+        <tr>
+          <td>{{ workshop.title }}</td>
+          <td>{{ workshop.location.title }}</td>
+          <td>{{ schedule.start_datetime.strftime(datetime_format) }}</td>
+          <td>{{ schedule.end_datetime.strftime(datetime_format) }}</td>
+          <td>
+            {% if schedule.tutor_id != session['user']['id'] %}
+              {{ 'Run by ' ~ schedule.tutor.full_name }}
+            {% else %}
+              <span {% if schedule.start_datetime > now %} data-bs-toggle="tooltip" data-bs-title="Attendance can be taken after the workshop" {% endif %}>
+                <button class="btn btn-outline-primary btn-sm position-relative"
+                        onclick="location.href='{{ url_for('schedule_view.attendance', id=schedule.id) }}'"
+                        {% if schedule.start_datetime > now %}disabled{% endif %}>
+                  <i class="fa-solid fa-users"></i>
+                  Attendance
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ schedules_counts_dict[schedule.id].total_attended }} / {{ schedules_counts_dict[schedule.id].total_bookings }}
+                  </span>
+                </button>
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% with items=schedules, route_args = {'search': search}, route_name='tutor_view.workshop_schedules' %}
+    {% include 'components/pagination.html' %}
+  {% endwith %}
+{% endblock %}

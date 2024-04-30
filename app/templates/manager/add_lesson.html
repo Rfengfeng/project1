@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% set page_title = "Add Lesson" %}
+{% block content %}
+    <h2>
+        <i class="fas fa-chalkboard-teacher"></i> Add a New Lesson
+    </h2>
+    <form action="{{ url_for("manager_view.add_lesson") }}" method="post">
+        <div class="mb-3">
+            <label for="lesson_title" class="form-label">Lesson Title:</label>
+            <input type="text"
+                   id="lesson_title"
+                   name="lesson_title"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a lesson title.</div>
+        </div>
+        <div class="mb-3">
+            <label for="lesson_number" class="form-label">Lesson Number:</label>
+            <input type="text"
+                   id="lesson_number"
+                   name="lesson_number"
+                   class="form-control"
+                   required>
+            <div class="invalid-feedback">Please provide a lesson number.</div>
+        </div>
+        <div class="mb-3">
+            <label for="lesson_description" class="form-label">Lesson Description:</label>
+            <textarea id="lesson_description"
+                      name="lesson_description"
+                      class="form-control"
+                      rows="4"
+                      required></textarea>
+            <div class="invalid-feedback">Please provide a lesson description.</div>
+        </div>
+        <div class="form-group">
+            <label for="lesson_cost">Cost:</label>
+            <input type="number"
+                   class="form-control"
+                   id="lesson_cost"
+                   name="lesson_cost"
+                   value="100.00"
+                   required>
+            <div class="invalid-feedback">Please provide a valid cost.</div>
+        </div>
+        <div class="form-group">
+            <label for="tutor">Tutor:</label>
+            <select class="form-control" id="tutor" name="tutor" required>
+                <option value="" disabled selected>Select a tutor</option>
+                {% for tutor in tutors %}<option value="{{ tutor.id }}">{{ tutor.full_name }}</option>{% endfor %}
+            </select>
+            <div class="invalid-feedback">Please assign a tutor for the lesson.</div>
+        </div>
+        <div style="margin-top: 20px;"></div>
+        <!-- Add some margin/padding here -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

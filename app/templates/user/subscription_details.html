@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% set page_title = "Subscription Status" %}
+{% block content %}
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
+            <a class="navbar-brand" href="#">Subscription Details</a>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for("user_view.dashboard") }}">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="py-4">
+            <h1>My Subscription Details</h1>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>{{ email }}</td>
+                        <td rowspan="1" class="text-end align-middle">
+                            <a href="{{ url_for("user_view.profile") }}" class="btn btn-primary">My Profile</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">My current plan</th>
+                        <td>{{ subscription.title }}</td>
+                        <td rowspan="1" class="text-end align-middle">
+                            <a href="{{ url_for('subscription_view.renew_subscription', user_id=user.id) }}"
+                               class="btn btn-primary">Renew Subscription</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">End date</th>
+                        <td>{{ user_subscription.end_datetime.strftime(date_format) }}</td>
+                        <td rowspan="1" class="text-end align-middle">
+                            <a href="{{ url_for('subscription_view.payment_history', user_id=user.id) }}"
+                               class="btn btn-primary">Payment History</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

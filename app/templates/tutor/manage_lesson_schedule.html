@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% set page_title = "Manage Lesson Schedule" %}
+{% set datetime = namespace(now=now) %}
+{% block content %}
+    <h2>Create a New Lesson Schedule</h2>
+    <div class="col-md-6">
+        <a href="{{ url_for("tutor_view.create_lesson_schedule") }}"
+           class="btn btn-primary">Create a New Lesson Schedule</a>
+    </div>
+    <div class="mb-3"></div>
+    <h2>Manage Lesson Schedule</h2>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form method="get"
+                  action="{{ url_for("tutor_view.manage_lesson_schedule") }}"
+                  class="d-flex">
+                <input type="text"
+                       id="search"
+                       name="search"
+                       class="form-control me-2"
+                       placeholder="Enter Keyword">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    <form id="delete-form"
+          method="post"
+          action="{{ url_for("tutor_view.manage_lesson_schedule") }}">
+    </form>
+    <button type="submit"
+            name="action"
+            value="delete_selected"
+            form="delete-form"
+            class="btn btn-danger">Delete Selected Schedules</button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <!-- Checkbox column -->
+                {# <th>Lesson ID</th> #}
+                <th>Lesson Title</th>
+                {# <th>Schedule ID</th> #}
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in lesson_schedules %}
+                {% set lesson = schedule.lesson %}
+                <tr>
+                    {% if schedule.start_datetime >= datetime.now %}
+                        <td>
+                            <input type="checkbox"
+                                   name="delete_ids[]"
+                                   value="{{ schedule.id }}"
+                                   form="delete-form">
+                        </td>
+                    {% else %}
+                        <td></td>
+                        <!-- Placeholder cell -->
+                    {% endif %}
+                    {# <td>{{ lesson.id }}</td> #}
+                    <td>{{ lesson.title }}</td>
+                    {# <td>{{ schedule.id }}</td> #}
+                    <td>
+                        <input form="edit-form-{{ schedule.id }}"
+                               type="datetime-local"
+                               name="start_datetime_{{ schedule.id }}"
+                               value="{{ schedule.start_datetime }}"
+                               required
+                               class="form-control">
+                        <div class="invalid-feedback" id="start_datetime_error_{{ schedule.id }}">
+                            Please input a valid datetime. Start time can not be earlier than now.
+                        </div>
+                    </td>
+                    <td>
+                        <input form="edit-form-{{ schedule.id }}"
+                               type="datetime-local"
+                               name="end_datetime_{{ schedule.id }}"
+                               value="{{ schedule.end_datetime }}"
+                               required
+                               class="form-control">
+                        <div class="invalid-feedback" id="end_datetime_error_{{ schedule.id }}">
+                            Please input a valid datetime. End time can not be earlier than start time.
+                        </div>
+                    </td>
+                    <td>
+                        <form id="edit-form-{{ schedule.id }}"
+                              method="post"
+                              action="{{ url_for("tutor_view.manage_lesson_schedule") }}">
+                            {% if schedule.start_datetime < datetime.now %}
+                                Past Schedule
+                            {% else %}
+                                <input type="hidden" name="selected_schedule_id" value="{{ schedule.id }}">
+                                <button type="submit" name="save_{{ schedule.id }}" class="btn btn-primary">Update</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% with items=lesson_schedules, route_name="tutor_view.manage_lesson_schedule", route_args={'search_query': search_query} %}
+        {% include 'components/pagination.html' %}
+    {% endwith %}
+{% endblock %}

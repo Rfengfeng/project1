@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% set page_title = "Create a Lesson Schedule" %}
+{% block content %}
+    <h2>Create a Lesson Schedule</h2>
+    <form method="post"
+          action="{{ url_for("tutor_view.create_lesson_schedule") }}">
+        <label>
+            <input type="radio"
+                   name="option"
+                   value="new_lesson"
+                   {% if new_lesson is sameas True %}checked{% endif %}>
+            Create a schedule for a new lesson
+        </label>
+        <br>
+        <label>
+            <input type="radio"
+                   name="option"
+                   value="existing_lesson"
+                   {% if new_lesson is sameas False %}checked{% endif %}>
+            Create a schedule for an existing lesson
+        </label>
+        <br>
+        <button type="submit" class="btn btn-primary">Start</button>
+    </form>
+{% endblock %}

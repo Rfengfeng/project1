@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% set page_title = "Expired subscriptions" %}
+{% block content %}
+    <div class="container mt-5">
+        <h2>Expired and Expiring Subscriptions</h2>
+        <!-- Search Form -->
+        <form class="mb-4"
+              method="post"
+              action="{{ url_for("subscription_view.expired_subscriptions_get") }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="query" class="form-label"></label>
+                    <input type="text"
+                           id="query"
+                           name="query"
+                           class="form-control"
+                           placeholder="Search by member name or email"
+                           value="{{ query or '' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+        <!-- Bootstrap Tabs -->
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        id="Expired-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#Expired"
+                        type="button"
+                        role="tab"
+                        aria-controls="Expired"
+                        aria-selected="true">Expired Subscriptions</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="AboutToExpire-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#AboutToExpire"
+                        type="button"
+                        role="tab"
+                        aria-controls="AboutToExpire"
+                        aria-selected="false">Expiring Subscriptions</button>
+            </li>
+        </ul>
+        <!-- Tab Content -->
+        <div class="tab-content" id="myTabContent">
+            <!-- Expired Subscriptions Tab -->
+            <div id="Expired"
+                 class="tab-pane fade show active"
+                 role="tabpanel"
+                 aria-labelledby="Expired-tab">
+                <h3 class="mb-3">Expired Subscriptions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Member Name</th>
+                            <th>Subscription End Date</th>
+                            <th>Last Reminded At</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscription in expired_subscriptions.items %}
+                            {% set user = subscription.user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('manager_view.view_profile', id=user.id) }}"
+                                       target="_blank">{{ user.full_name }}</a>
+                                </td>
+                                <td>{{ subscription.end_datetime.strftime(date_format) }}</td>
+                                <td>
+                                    {{ sent_reminders[subscription.user_id].reminded_at.strftime(datetime_format) if subscription.user_id in sent_reminders else 'N/A' }}
+                                </td>
+                                <td class="text-end">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            onclick="remind('{{ url_for('reminder_api.send_subscription_reminder', id=subscription.id) }}')">
+                                        <i class="fa-solid fa-bell"></i> Remind
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if expired_subscriptions.total == 0 %}
+                            <tr>
+                                <td colspan="3" class="text-center">No expired subscriptions</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <!-- Include Pagination for Expired Subscriptions -->
+                {% with items=expired_subscriptions, page_key_name="expired_page", route_args={'_anchor': "Expired", "query": query or ''}, route_name='subscription_view.expired_subscriptions_get' %}
+                    {% include 'components/pagination.html' %}
+                {% endwith %}
+            </div>
+            <!-- About to Expire Subscriptions Tab -->
+            <div id="AboutToExpire"
+                 class="tab-pane fade"
+                 role="tabpanel"
+                 aria-labelledby="AboutToExpire-tab">
+                <h3 class="mb-3">Subscriptions Expiring in 7 Days</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Member Name</th>
+                            <th>Subscription End Date</th>
+                            <th>Last Reminded At</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscription in about_to_expire_subscriptions.items %}
+                            {% set user = subscription.user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('manager_view.view_profile', id=user.id) }}"
+                                       target="_blank">{{ user.full_name }}</a>
+                                </td>
+                                <td>{{ subscription.end_datetime }}</td>
+                                <td>
+                                    {{ sent_reminders[subscription.user_id].reminded_at.strftime(datetime_format) if subscription.user_id in sent_reminders else 'N/A' }}
+                                </td>
+                                <td class="text-end">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            onclick="remind('{{ url_for('reminder_api.send_subscription_reminder', id=subscription.id) }}')">
+                                        <i class="fa-solid fa-bell"></i> Remind
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if about_to_expire_subscriptions.total == 0 %}
+                            <tr>
+                                <td colspan="3" class="text-center">No subscriptions about to expire</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <!-- Include Pagination for About to Expire Subscriptions -->
+                {% with items=about_to_expire_subscriptions, page_key_name="expring_page", route_args={'_anchor': "AboutToExpire", "query": query or ''}
+                    , route_name='subscription_view.expired_subscriptions_get' %}
+                    {% include 'components/pagination.html' %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+    {% with title="Send reminder?", body="Are you sure you would like to send a reminder to this user?" %}
+        {% include 'components/modals/confirmation_modal.html' %}
+    {% endwith %}
+    <script>
+        var url;
+        function remind(api_url) {
+            url = api_url;
+            $('#confirmation-modal').modal('show');
+        }
+        function onConfirm(){
+            fetch(url, {
+                method: 'POST',
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    fireToastMessage('Error sending reminder', 'error');
+                }
+            }).then(resp => {
+                if (resp.success) {
+                    flashAndReload(resp.message || 'Reminder sent successfully', 'success');
+                    $('#confirmation-modal').modal('hide');
+                } else {
+                    fireToastMessage(resp.message || 'Error sending reminder', 'error');
+                }
+            });
+        }
+    </script>
+{% endblock %}

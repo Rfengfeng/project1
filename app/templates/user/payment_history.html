@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% set page_title = "Payment History" %}
+{% block content %}
+    <div class="container">
+        <h1>Payment History for {{ user.email }}</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Subscription</th>
+                    <th>Membership starts</th>
+                    <th>Expiry</th>
+                    <th class="text-end">Amount Paid</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment, subscription_title, amount_paid, start_datetime, end_datetime in payments %}
+                    <tr>
+                        <td>{{ payment.paid_at.strftime(date_format) }}</td>
+                        <td>{{ subscription_title }}</td>
+                        <td>{{ start_datetime.strftime(date_format) }}</td>
+                        <td>
+                            <span class="{{ 'text-danger' if end_datetime < now else 'text-success' }}">{{ end_datetime.strftime(date_format) }}</span>
+                        </td>
+                        <td class="text-end">${{ '{:,.2f}'.format(amount_paid) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

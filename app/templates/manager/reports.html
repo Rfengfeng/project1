@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% set page_title = "Reports" %}
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+  <script type="text/javascript">
+    $(function () {
+      const monthlyData = {{ monthly_data | tojson }};
+      const monthlyCtx = document.getElementById('monthly-report').getContext('2d');
+
+      const fyData = {{ fy_data | tojson }};
+      const fyCtx = document.getElementById('fy-report').getContext('2d');
+      showRevenueChart(monthlyCtx, monthlyData);
+      showRevenueChart(fyCtx, fyData);
+    });
+  </script>
+  <style type="text/css">
+    canvas {
+      width: 100%;
+      height: minmax(200px, 40vh);
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <h1 class="py-4">Reports</h1>
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="revenue-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#revenue-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="revenue-tab-pane"
+              aria-selected="true">Revenue reports</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a href="{{ url_for("report_view.workshops") }}"
+         class="nav-link"
+         id="workshops-tab"
+         type="button"
+         role="tab">Workshops</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a href="{{ url_for("report_view.attendance") }}"
+         class="nav-link"
+         id="attendance-tab"
+         type="button"
+         role="tab">Attendance</a>
+    </li>
+  </ul>
+  <div id="revenue-tab-pane" class="tab-pane fade show active">
+    <h2 class="py-4">Monthly Revenue</h2>
+    <div>
+      <canvas id="monthly-report"></canvas>
+    </div>
+    <div class="pt-4">
+      <table class="table">
+        <head>
+          <tr>
+            <th>Year - Month</th>
+            <th class="text-end">Subscriptions</th>
+            <th class="text-end">Lesson</th>
+            <th class="text-end">Workshop</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </head>
+        <tbody>
+          {% for year_month in monthly_data %}
+            {% set row = monthly_data[year_month] %}
+            <tr>
+              <td>{{ year_month }}</td>
+              <td class="text-end">${{ '{:0,.2f}'.format(row['subscription']) }}</td>
+              <td class="text-end">${{ '{:0,.2f}'.format(row['lesson']) }}</td>
+              <td class="text-end">${{ '{:0,.2f}'.format(row['workshop']) }}</td>
+              <td class="text-end">${{ '{:0,.2f}'.format(row['total']) }}</td>
+            </tr>
+          {% endfor %}
+          <tr>
+            <td>
+              <strong>Grand Total</strong>
+            </td>
+            <td class="text-end">${{ '{:0,.2f}'.format(monthly_grand_totals['subscription']) }}</td>
+            <td class="text-end">${{ '{:0,.2f}'.format(monthly_grand_totals['lesson']) }}</td>
+            <td class="text-end">${{ '{:0,.2f}'.format(monthly_grand_totals['workshop']) }}</td>
+            <td class="text-end">${{ '{:0,.2f}'.format(monthly_grand_totals['total']) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pt-4">
+      <h2 class="py-4">Revenue by Financial Year</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <canvas id="fy-report"></canvas>
+        </div>
+        <div class="col-md-6">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Financial Year</th>
+                <th class="text-end">Subscriptions</th>
+                <th class="text-end">Lesson</th>
+                <th class="text-end">Workshop</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for year in fy_data %}
+                {% set row = fy_data[year] %}
+                <tr>
+                  <td>{{ year }}</td>
+                  <td class="text-end">${{ '{:0,.2f}'.format(row['subscription']) }}</td>
+                  <td class="text-end">${{ '{:0,.2f}'.format(row['lesson']) }}</td>
+                  <td class="text-end">${{ '{:0,.2f}'.format(row['workshop']) }}</td>
+                  <td class="text-end">${{ '{:0,.2f}'.format(row['total']) }}</td>
+                </tr>
+              {% endfor %}
+              <tr>
+                <td>
+                  <strong>Grand Total</strong>
+                </td>
+                <td class="text-end">${{ '{:0,.2f}'.format(fy_grand_totals['subscription']) }}</td>
+                <td class="text-end">${{ '{:0,.2f}'.format(fy_grand_totals['lesson']) }}</td>
+                <td class="text-end">${{ '{:0,.2f}'.format(fy_grand_totals['workshop']) }}</td>
+                <td class="text-end">${{ '{:0,.2f}'.format(fy_grand_totals['total']) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

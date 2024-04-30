@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% set page_title = "Booking details" %}
+{% block content %}
+  <h1 class="py-4">Booking details</h1>
+  <dl>
+    <dt>Booking type</dt>
+    <dd>
+      {{ booking.type }}
+    </dd>
+    {% if booking.type == 'lesson' %}
+      <dt>Subject</dt>
+      <dd>
+        {{ booking.schedule.lesson.title }}
+      </dd>
+    {% else %}
+      <dt>Workshop</dt>
+      <dd>
+        {{ booking.schedule.workshop.title }}
+      </dd>
+      <dt>Location</dt>
+      <dd>
+        {{ booking.schedule.workshop.location }}
+      </dd>
+    {% endif %}
+    <dt>Tutor</dt>
+    <dd>
+      {{ booking.schedule.tutor.full_name }}
+    </dd>
+    <dt>Start</dt>
+    <dd>
+      {{ booking.start_datetime.strftime(datetime_format) }}
+    </dd>
+    <dt>Finish</dt>
+    <dd>
+      {{ booking.end_datetime.strftime(datetime_format) }}
+    </dd>
+    <dt>Status</dt>
+    {% if booking.status=='confirmed' %}
+      <dd class="text-success">
+        Confirmed
+      </dd>
+    {% elif booking.status == 'cancelled' %}
+      <dd class="text-danger">
+        Cancelled
+      </dd>
+    {% else %}
+      <dd class="text-info">
+        Pending
+      </dd>
+    {% endif %}
+    <dt>Cost</dt>
+    <dd>
+      ${{ '%0.2f' % booking.cost }}
+    </dd>
+    {% if booking.cost %}
+      <dt>Payment status</dt>
+      {% if booking.amount_paid %}
+        <dd class="text-success">
+          Paid
+        </dd>
+      {% else %}
+        <dd class="text-danger">
+          Unpaid
+        </dd>
+      {% endif %}
+    {% endif %}
+  </dl>
+{% endblock %}

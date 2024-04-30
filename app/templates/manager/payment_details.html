@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% set page_title = "Payment Details" %}
+{% block content %}
+    <div class="container">
+        <h1>Payment Details</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Payment Information</h5>
+                <p class="card-text">
+                    <i class="fa-solid fa-calendar-days"></i> Payment Date: {{ payment.paid_at.strftime(datetime_format) }}
+                </p>
+                <p class="card-text">
+                    <i class="fa-solid fa-person"></i> Name: {{ payment.user.full_name }}
+                </p>
+                <p class="card-text">
+                    <i class="fa-solid fa-envelope"></i> Email: {{ payment.user.email }}
+                </p>
+                <p class="card-text">
+                    <i class="fa-solid fa-dollar-sign"></i> Amount Paid: ${{ payment.amount_paid }}
+                </p>
+                {% if payment.refunded_amount %}
+                    <p class="card-text text-danger">
+                        <i class="fa-solid fa-dollar-sign"></i> Refunded Amount: ${{ payment.refunded_amount }}
+                        <br />
+                        Refunded on {{ payment.refunded_at.strftime(datetime_format) }}
+                    </p>
+                {% endif %}
+                <p class="card-text">
+                    <i class="fa-solid fa-book"></i> Item Purchased: {{
+                    payment.user_subscription.subscription.title if payment.user_subscription_id else
+                    payment.booking.schedule.lesson.title if (payment.booking.id and payment.booking.schedule.lesson_id) else
+                    payment.booking.schedule.workshop.title if payment.booking.id and payment.booking.schedule.workshop_id else ''
+                    }}
+                </p>
+                <p class="card-text">
+                    <i class="fa-solid fa-bars-progress"></i> Payment Status: {{ payment.status }}
+                </p>
+                <a href="{{ url_for("track_payments_view.track_payments") }}"
+                   class="btn btn-secondary mt-3">
+                    <i class="fa-solid fa-left-long"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

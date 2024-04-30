@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% set page_title = "List Workshop" %}
+{% block head %}
+    <script>
+        var route, action, form;
+
+    function onChangeStatusClick(e) {
+      route = e.target.getAttribute('data-route-url');  
+        action = e.target.getAttribute('data-action'); 
+        form=document.getElementById('confirmation-form');
+        form.action=route;
+        form.method='post';
+        if (action === 'confirm') {
+            $('#confirmation-modal').find('.modal-body').text('Are you sure you would like to delete this Schedule?');
+        }
+      $('#confirmation-modal').modal('show');
+    }
+
+    function onConfirm() {      
+      form.submit()    
+    }
+    // set week_offset defult value
+    let week_offset = {{ week_offset }};
+
+    // update week_offset value
+    function updateWeekOffset(offset) {        
+        week_offset += offset;
+        // put it into form
+        document.getElementById("weekOffsetInput").value = week_offset;
+    }
+    function submitForm() {
+        document.getElementById("workshopFilterForm").submit();
+    }
+    </script>
+{% endblock head %}
+{% block content %}
+    <h3 class="my-4 py-4">
+        <i class="fa-regular fa-calendar-days text-secondary"></i>
+        Weekly Schedules ({{ current_week_start }} : {{ current_week_end }})
+    </h3>
+    <!-- oeder of weekdays -->
+    {% set weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+    <!-- Using a for loop to generate workshop information -->
+    <div class="table-responsive pb-2">
+        {# Navigation buttons for weeks #}
+        <div class="d-flex justify-content-start mb-3">
+            <a href="{{ url_for('manager_view.list_workshop', week_offset=week_offset-1) }}"
+               onclick="updateWeekOffset(-1)"
+               class="link link-primary me-1">&lt;&lt;- Previous Week</a>
+            <a href="{{ url_for('manager_view.list_workshop', week_offset=0) }}"
+               onclick="updateWeekOffset(0)"
+               class="link link-primary me-auto ms-auto">Current Week</a>
+            <a href="{{ url_for('manager_view.list_workshop', week_offset=week_offset+1) }}"
+               onclick="updateWeekOffset(1)"
+               class="link link-primary ms-1">Next Week -&gt;&gt;</a>
+        </div>
+        <form id="workshopFilterForm"
+              action="{{ url_for("manager_view.list_workshop") }}"
+              method="post">
+            <input type="hidden"
+                   id="week_offset"
+                   name="week_offset"
+                   value="{{ week_offset }}">
+            <div class="input-group my-2">
+                <label for="workshopFilter" class="input-group-text">Filter by Workshop</label>
+                <select class="form-select"
+                        id="workshopFilter"
+                        name="workshopFilter"
+                        onchange="this.form.submit();">
+                    <option value="" {% if selected_workshop_id == "" %}selected{% endif %}>All workshops</option>
+                    {% for workshop in workshops %}
+                        <option value="{{ workshop.id }}"
+                                {% if selected_workshop_id | string == workshop.id|string %}selected{% endif %}>
+                            {{ workshop.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- for week_offset value -->
+        </form>
+        <div class="text-end">
+            <a href="{{ url_for("manager_view.add_workshop_schedule") }}"
+               class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Add new schedule
+            </a>
+        </div>
+    </div>
+    {% if grouped_schedules | length == 0 %}
+        <p>There are no scheduled for selected worshop of this week.</p>
+    {% else %}
+        <!-- Show each day in order -->
+        {% for day_of_week in weekdays %}
+            {% if day_of_week in grouped_schedules %}
+                <h2>{{ day_of_week }}</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Workshop Title</th>
+                            <th>Location</th>
+                            <th>Tutor</th>
+                            <th>Price</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>&nbsp;</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for schedule in grouped_schedules[day_of_week] %}
+                            {% set workshop_started = schedule.start_datetime <= now %}
+                            <tr>
+                                <td>{{ schedule.workshop.title }}</td>
+                                <td>{{ schedule.workshop.location.title }}</td>
+                                <td>{{ schedule.tutor.full_name }}</td>
+                                <td>${{ '{:,.2f}'.format(schedule.workshop.price) }}</td>
+                                <td>{{ schedule.start_datetime.strftime(datetime_format) }}</td>
+                                <td>{{ schedule.end_datetime.strftime(datetime_format) }}</td>
+                                <td>
+                                    <span {% if not workshop_started %} data-bs-toggle="tooltip" title="Attendance can only be recorded after the workshop has started." {% endif %}>
+                                        <button type="button" {{ 'disabled' if not workshop_started else '' }} onclick="location.href='{{ url_for('schedule_view.attendance', id=schedule.id) }}'" class="btn btn-outline-primary btn-sm position-relative">
+                                            <i class="fa-solid fa-users"></i>
+                                            Attendance
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                {{ schedule.bookings | selectattr("attended", "equalto", true) | list | length }} / {{ schedule.bookings | length }}
+                                                <span class="visually-hidden">Member booked</span>
+                                            </span>
+                                        </button>
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        {% if schedule.end_datetime <= now %}
+                                            <span class="btn btn-success btn-sm">Completed</span>
+                                        {% elif schedule.start_datetime > now %}
+                                            {% if schedule.bookings %}
+                                                <a class="btn btn-outline-primary btn-sm"
+                                                   data-bs-toggle="tooltip"
+                                                   title="A booked schedule cannot be edited">Edit</a>
+                                                <a class="btn btn-outline-primary btn-sm"
+                                                   data-bs-toggle="tooltip"
+                                                   title="A booked schedule cannot be deleted.">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ url_for('manager_view.edit_workshop_schedule', id=schedule.id) }}"
+                                                   class="btn btn-primary btn-sm">Edit</a>
+                                                <button type="button"
+                                                        onclick="onChangeStatusClick(event)"
+                                                        data-route-url="{{ url_for('manager_view.delete_workshop_schedule', id=schedule.id) }}"
+                                                        data-action="confirm"
+                                                        class="btn btn-danger btn-sm">Delete</button>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="btn btn-warning btn-sm">In Progress</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    <div class="d-flex justify-content-end"></div>
+    {% with title= "Please confirm", body = "Are you sure you would like to book this workshop?" %}
+        {% include 'components/modals/confirmation_modal.html' %}
+    {% endwith %}
+{% endblock %}
